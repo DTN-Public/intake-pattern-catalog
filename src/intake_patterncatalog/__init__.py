@@ -71,13 +71,3 @@ class PatternCatalog(Catalog, PatternMixin):
                 entry.name = PatternCatalog._entry_name(value_map)
                 self._entries[entry.name] = entry
                 entry._filesystem = self.filesystem
-
-
-# mycat = Catalog.from_dict(
-#     {
-#         "source1": PatternCatalog(
-#             path="s3://dtn-data-science/sia/customer_data/processed/eversource/eversource_v{version}_outages_all.parquet",
-#             driver="parquet",
-#         ),
-#     }
-# )
