@@ -30,6 +30,7 @@ class PatternCatalog(Catalog, PatternMixin):
         self.text = None
         self.autoreload = autoreload  # set this to False if don't want reloads
         self.filesystem = kwargs.pop("fs", None)
+        self.csv_kwargs = kwargs.pop("csv_kwargs", None)
         self.access = "name" not in kwargs
         self.driver = driver
         self.metadata = kwargs.get("metadata", {})
@@ -65,7 +66,13 @@ class PatternCatalog(Catalog, PatternMixin):
             for values in zip(*patterns.values()):
                 value_map = {k: v for k, v in zip(value_names, values)}
                 path = self.path.format(**value_map)
-                entry = registry[self.driver](urlpath=path, metadata=self.metadata)
+                kwargs = {}
+                if self.driver == "csv" and self.csv_kwargs is not None:
+                    kwargs["csv_kwargs"] = self.csv_kwargs
+
+                entry = registry[self.driver](
+                    urlpath=path, metadata=self.metadata, **kwargs
+                )
 
                 entry._catalog = self
                 entry.name = PatternCatalog._entry_name(value_map)
