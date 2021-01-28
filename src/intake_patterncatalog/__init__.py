@@ -1,10 +1,10 @@
-from typing import Dict, List
+from typing import Dict, List, Mapping
 
 import fsspec
 from fsspec.core import strip_protocol
 from intake import registry
 from intake.catalog import Catalog
-from intake.source.base import PatternMixin
+from intake.source.base import DataSource, PatternMixin
 from intake.source.utils import path_to_glob, reverse_formats
 
 
@@ -43,12 +43,20 @@ class PatternCatalog(Catalog, PatternMixin):
         super(PatternCatalog, self).__init__(**kwargs)
 
     @staticmethod
-    def _entry_name(value_map):
-        return (
+    def _entry_name(value_map: Mapping[str, str]) -> str:
+        name = (
             "_".join(f"{k}_{v}" for k, v in value_map.items())
             .replace(" ", "_")
             .replace(".", "_")
-        )  # Todo: ensure this is a valid python identifier
+            .replace("/", "_")
+        )
+        # Ensure this is a valid python identifier
+        assert name.isidentifier()
+        return name
+
+    def get_entry(self, **kwargs) -> DataSource:
+        name = self._entry_name(**kwargs)
+        return self._entries[name]
 
     def _load(self, reload=False):
         if self.access is False:
