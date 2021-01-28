@@ -44,18 +44,17 @@ class PatternCatalog(Catalog, PatternMixin):
 
     @staticmethod
     def _entry_name(value_map: Mapping[str, str]) -> str:
-        name = (
-            "_".join(f"{k}_{v}" for k, v in value_map.items())
-            .replace(" ", "_")
-            .replace(".", "_")
-            .replace("/", "_")
-        )
+        name = "_".join(f"{k}_{v}" for k, v in value_map.items())
+
+        # Replace all non-alphanumeric characters with _
+        name = "".join([c if c.isalnum() else "_" for c in name])
+
         # Ensure this is a valid python identifier
         assert name.isidentifier()
         return name
 
     def get_entry(self, **kwargs) -> DataSource:
-        name = self._entry_name(**kwargs)
+        name = self._entry_name(kwargs)
         return self._entries[name]
 
     def get_entry_path(self, **kwargs) -> DataSource:
