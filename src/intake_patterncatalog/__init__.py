@@ -58,6 +58,9 @@ class PatternCatalog(Catalog, PatternMixin):
         name = self._entry_name(**kwargs)
         return self._entries[name]
 
+    def get_entry_path(self, **kwargs) -> DataSource:
+        return self.path.format(**kwargs)
+
     def _load(self, reload=False):
         if self.access is False:
             # skip first load, if cat has given name (i.e., is subcat)
