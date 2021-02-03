@@ -34,6 +34,7 @@ class PatternCatalog(Catalog, PatternMixin):
         self.access = "name" not in kwargs
         self.driver = driver
         self.metadata = kwargs.get("metadata", {})
+        self.storage_options = kwargs.get("storage_options", None)
 
         self._loaded_once = False
         self._glob_path = path_to_glob(path)
@@ -69,6 +70,7 @@ class PatternCatalog(Catalog, PatternMixin):
         if self.autoreload or reload:
             fs, _, paths = fsspec.get_fs_token_paths(
                 self._glob_path,
+                storage_options=self.storage_options
             )
             patterns: Dict[str, List[str]] = reverse_formats(self._pattern, paths)
             value_names = list(patterns.keys())
@@ -77,7 +79,7 @@ class PatternCatalog(Catalog, PatternMixin):
                 value_map = {k: v for k, v in zip(value_names, values)}
                 path = self.path.format(**value_map)
                 entry = registry[self.driver](
-                    urlpath=path, metadata=self.metadata, **self.driver_kwargs
+                    urlpath=path, metadata=self.metadata, storage_options=self.storage_options, **self.driver_kwargs
                 )
 
                 entry._catalog = self
