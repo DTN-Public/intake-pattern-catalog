@@ -62,7 +62,7 @@ class PatternCatalog(Catalog, PatternMixin):
         name = self._entry_name(kwargs)
         return self._entries[name]
 
-    def get_entry_kwarg_sets(self) -> List[dict]:
+    def get_entry_kwarg_sets(self) -> List[Dict[str, str]]:
         """
         Return all the valid kwarg sets, which can be passed to get_entry to get a
         particular catalog entry
