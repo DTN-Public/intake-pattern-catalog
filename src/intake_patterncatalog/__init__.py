@@ -35,6 +35,7 @@ class PatternCatalog(Catalog, PatternMixin):
         self.driver = driver
         self.metadata = kwargs.get("metadata", {})
         self.storage_options = kwargs.get("storage_options", None)
+        self._kwarg_sets: List[Dict[str, str]] = []
 
         self._loaded_once = False
         self._glob_path = path_to_glob(path)
@@ -55,8 +56,18 @@ class PatternCatalog(Catalog, PatternMixin):
         return name
 
     def get_entry(self, **kwargs) -> DataSource:
+        """
+        Given a kwarg set, return the related catalog entry
+        """
         name = self._entry_name(kwargs)
         return self._entries[name]
+
+    def get_entry_kwarg_sets(self) -> List[dict]:
+        """
+        Return all the valid kwarg sets, which can be passed to get_entry to get a
+        particular catalog entry
+        """
+        return self._kwarg_sets
 
     def get_entry_path(self, **kwargs) -> DataSource:
         return self.path.format(**kwargs)
@@ -69,17 +80,20 @@ class PatternCatalog(Catalog, PatternMixin):
             return
         if self.autoreload or reload:
             fs, _, paths = fsspec.get_fs_token_paths(
-                self._glob_path,
-                storage_options=self.storage_options
+                self._glob_path, storage_options=self.storage_options
             )
             patterns: Dict[str, List[str]] = reverse_formats(self._pattern, paths)
             value_names = list(patterns.keys())
             self._entries = {}
             for values in zip(*patterns.values()):
                 value_map = {k: v for k, v in zip(value_names, values)}
+                self._kwarg_sets.append(value_map)
                 path = self.path.format(**value_map)
                 entry = registry[self.driver](
-                    urlpath=path, metadata=self.metadata, storage_options=self.storage_options, **self.driver_kwargs
+                    urlpath=path,
+                    metadata=self.metadata,
+                    storage_options=self.storage_options,
+                    **self.driver_kwargs,
                 )
 
                 entry._catalog = self
