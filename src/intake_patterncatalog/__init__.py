@@ -45,7 +45,7 @@ class PatternCatalog(Catalog, PatternMixin):
 
     @staticmethod
     def _entry_name(value_map: Mapping[str, str]) -> str:
-        name = "_".join(f"{k}_{v}" for k, v in value_map.items())
+        name = "_".join(f"{k}_{v}" for k, v in value_map.items() if v is not None)
 
         # Replace all non-alphanumeric characters with _
         name = "".join([c if c.isalnum() else "_" for c in name])
