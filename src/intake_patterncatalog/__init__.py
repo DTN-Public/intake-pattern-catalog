@@ -41,8 +41,16 @@ class PatternCatalog(Catalog, PatternMixin):
         self._glob_path = path_to_glob(path)
         if path == self._glob_path:
             raise ValueError("Path must contain one or more `{}` patterns.")
-        self._pattern = strip_protocol(path)
         super(PatternCatalog, self).__init__(**kwargs)
+
+    @property
+    def _pattern(self):
+        if "::" not in self.path:
+            path = self.path
+        else:
+            # removes simplecache:: or similar
+            path = self.path.split("::")[1]
+        return strip_protocol(path) # removes s3://
 
     @staticmethod
     def _entry_name(value_map: Mapping[str, str]) -> str:
