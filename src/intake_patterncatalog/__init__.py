@@ -50,7 +50,7 @@ class PatternCatalog(Catalog, PatternMixin):
         else:
             # removes simplecache:: or similar
             path = self.path.split("::")[1]
-        return strip_protocol(path) # removes s3://
+        return strip_protocol(path)  # removes s3://
 
     @staticmethod
     def _entry_name(value_map: Mapping[str, str]) -> str:
