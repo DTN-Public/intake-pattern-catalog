@@ -11,7 +11,7 @@ from intake.source.utils import path_to_glob, reverse_formats
 class PatternCatalog(Catalog, PatternMixin):
     """Catalog as described by a pattern Parquet Path"""
 
-    version = "0.0.1"
+    version = "0.0.2"
     container = "catalog"
     partition_access = None
     name = "pattern_cat"
@@ -68,7 +68,7 @@ class PatternCatalog(Catalog, PatternMixin):
         Given a kwarg set, return the related catalog entry
         """
         name = self._entry_name(kwargs)
-        return self._entries[name]
+        return self._get_entries()[name]
 
     def get_entry_kwarg_sets(self) -> List[Dict[str, str]]:
         """
