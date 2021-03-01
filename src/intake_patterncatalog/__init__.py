@@ -68,7 +68,7 @@ class PatternCatalog(Catalog, PatternMixin):
         Given a kwarg set, return the related catalog entry
         """
         name = self._entry_name(kwargs)
-        return self._entries[name]
+        return self._get_entries()[name]
 
     def get_entry_kwarg_sets(self) -> List[Dict[str, str]]:
         """
