@@ -4,6 +4,7 @@ import fsspec
 from fsspec.core import strip_protocol
 from intake import registry
 from intake.catalog import Catalog
+from intake.catalog.utils import reload_on_change
 from intake.source.base import DataSource, PatternMixin
 from intake.source.utils import path_to_glob, reverse_formats
 
@@ -70,6 +71,7 @@ class PatternCatalog(Catalog, PatternMixin):
         name = self._entry_name(kwargs)
         return self._get_entries()[name]
 
+    @reload_on_change
     def get_entry_kwarg_sets(self) -> List[Dict[str, str]]:
         """
         Return all the valid kwarg sets, which can be passed to get_entry to get a
