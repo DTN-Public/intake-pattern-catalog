@@ -1,6 +1,7 @@
+import pathlib
+
 import pytest
 
-import pathlib
 from intake_patterncatalog import PatternCatalog
 
 
