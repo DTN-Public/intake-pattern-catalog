@@ -10,7 +10,7 @@ from intake.source.utils import path_to_glob, reverse_formats
 
 
 class PatternCatalog(Catalog, PatternMixin):
-    """Catalog as described by a pattern Parquet Path"""
+    """Catalog of entries as described by a path pattern (e.g. folder/{a}/{b}.csv)"""
 
     version = "0.0.2"
     container = "catalog"
@@ -101,6 +101,7 @@ class PatternCatalog(Catalog, PatternMixin):
             self.access = True
             return
         if self.autoreload or reload:
+            print("LOADING")
             fs, _, paths = fsspec.get_fs_token_paths(
                 self._glob_path, storage_options=self.storage_options
             )
