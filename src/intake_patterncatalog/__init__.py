@@ -101,7 +101,6 @@ class PatternCatalog(Catalog, PatternMixin):
             self.access = True
             return
         if self.autoreload or reload:
-            print("LOADING")
             fs, _, paths = fsspec.get_fs_token_paths(
                 self._glob_path, storage_options=self.storage_options
             )
