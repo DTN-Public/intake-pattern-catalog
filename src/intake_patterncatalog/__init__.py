@@ -52,8 +52,6 @@ class PatternCatalog(Catalog, PatternMixin):
         if "listings_expiry_time" not in storage_options:
             storage_options["use_listings_cache"] = False
 
-        print("STORAGE OPTIONS", storage_options)
-
         super(PatternCatalog, self).__init__(
             ttl=ttl, storage_options=storage_options, **kwargs
         )
