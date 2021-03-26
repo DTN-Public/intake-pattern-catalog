@@ -13,7 +13,7 @@ from intake_patterncatalog import PatternCatalog
 # This is necessary because of this issue
 # https://github.com/aio-libs/aiobotocore/issues/755
 class MonkeyPatchedAWSResponse(AWSResponse):
-    raw_headers = {}
+    raw_headers: dict = {}
 
     async def read(self):
         return self.text
