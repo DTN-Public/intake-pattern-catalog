@@ -49,7 +49,7 @@ class PatternCatalog(Catalog, PatternMixin):
 
         # Set use_listing_cache to False so that once the ttl runs
         # out, the fsspec cache doesn't keep the entry list from getting updated
-        if "listings_expiry_time" not in storage_options:
+        if "use_listings_cache" not in storage_options:
             storage_options["use_listings_cache"] = False
 
         super(PatternCatalog, self).__init__(

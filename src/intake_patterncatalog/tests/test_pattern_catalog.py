@@ -40,6 +40,11 @@ def ttl_config_s3():
 
 
 @pytest.fixture
+def ttl_config_s3_parquet():
+    return {"path": "s3://ttl/{num}.parquet", "driver": "parquet", "ttl": 0.1}
+
+
+@pytest.fixture
 def no_ttl_cat_s3(no_ttl_config_s3):
     return PatternCatalog.from_dict({}, **no_ttl_config_s3)
 
@@ -47,6 +52,11 @@ def no_ttl_cat_s3(no_ttl_config_s3):
 @pytest.fixture
 def ttl_cat_s3(ttl_config_s3):
     return PatternCatalog.from_dict({}, **ttl_config_s3)
+
+
+@pytest.fixture
+def ttl_cat_s3_parquet(ttl_config_s3_parquet):
+    return PatternCatalog.from_dict({}, **ttl_config_s3_parquet)
 
 
 def test_pattern_generation(empty_catalog):
@@ -75,3 +85,15 @@ def test_ttl_s3(ttl_cat_s3):
     assert ttl_cat_s3.get_entry_kwarg_sets() == []
     sleep(0.11)
     assert ttl_cat_s3.get_entry_kwarg_sets() == [{"num": "1"}, {"num": "2"}]
+
+
+@mock_s3
+def test_ttl_s3_parquet(ttl_cat_s3_parquet):
+    s3 = boto3.client("s3", region_name="us-east-1")
+    s3.create_bucket(Bucket="ttl")
+    assert ttl_cat_s3_parquet.get_entry_kwarg_sets() == []
+    s3.put_object(Body="", Bucket="ttl", Key="1.parquet")
+    s3.put_object(Body="", Bucket="ttl", Key="2.parquet")
+    assert ttl_cat_s3_parquet.get_entry_kwarg_sets() == []
+    sleep(0.11)
+    assert ttl_cat_s3_parquet.get_entry_kwarg_sets() == [{"num": "1"}, {"num": "2"}]
