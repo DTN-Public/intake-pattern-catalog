@@ -10,22 +10,24 @@ from intake.source.utils import path_to_glob, reverse_formats
 
 
 class PatternCatalog(Catalog, PatternMixin):
-    """Catalog as described by a pattern Parquet Path"""
+    """Catalog of entries as described by a path pattern (e.g. folder/{a}/{b}.csv)"""
 
     version = "0.0.2"
     container = "catalog"
     partition_access = None
     name = "pattern_cat"
 
-    def __init__(self, path, driver, autoreload=True, **kwargs):
+    def __init__(self, path, driver, autoreload=True, ttl=60, **kwargs):
         """
         Parameters
         ----------
         path: str
             Location of the file to parse (can be remote)
-        reload : bool
+        reload: bool
             Whether to watch the source file for changes; make False if you want
             an editable Catalog
+        ttl: int
+            How long to use the cached list of files before reloading.
         """
         self.path = path
         self.text = None
@@ -35,14 +37,24 @@ class PatternCatalog(Catalog, PatternMixin):
         self.access = "name" not in kwargs
         self.driver = driver
         self.metadata = kwargs.get("metadata", {})
-        self.storage_options = kwargs.get("storage_options", None)
+
         self._kwarg_sets: List[Dict[str, str]] = []
 
         self._loaded_once = False
         self._glob_path = path_to_glob(path)
         if path == self._glob_path:
             raise ValueError("Path must contain one or more `{}` patterns.")
-        super(PatternCatalog, self).__init__(**kwargs)
+
+        storage_options = kwargs.get("storage_options", {})
+
+        # Set use_listing_cache to False so that once the ttl runs
+        # out, the fsspec cache doesn't keep the entry list from getting updated
+        if "use_listings_cache" not in storage_options:
+            storage_options["use_listings_cache"] = False
+
+        super(PatternCatalog, self).__init__(
+            ttl=ttl, storage_options=storage_options, **kwargs
+        )
 
     @property
     def _pattern(self):
@@ -95,6 +107,7 @@ class PatternCatalog(Catalog, PatternMixin):
             patterns: Dict[str, List[str]] = reverse_formats(self._pattern, paths)
             value_names = list(patterns.keys())
             self._entries = {}
+            self._kwarg_sets = []
             for values in zip(*patterns.values()):
                 value_map = {k: v for k, v in zip(value_names, values)}
                 self._kwarg_sets.append(value_map)
