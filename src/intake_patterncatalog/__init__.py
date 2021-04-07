@@ -1,7 +1,7 @@
 from typing import Dict, List, Mapping
 
 import fsspec
-from fsspec.core import strip_protocol
+from fsspec.core import strip_protocol, url_to_fs
 from intake import registry
 from intake.catalog import Catalog
 from intake.catalog.utils import reload_on_change
@@ -36,6 +36,7 @@ class PatternCatalog(Catalog, PatternMixin):
         self.driver_kwargs = kwargs.pop("driver_kwargs", {})
         self.access = "name" not in kwargs
         self.driver = driver
+        self.listable = kwargs.pop("listable", True)
         self.metadata = kwargs.get("metadata", {})
 
         self._kwarg_sets: List[Dict[str, str]] = []
@@ -79,9 +80,29 @@ class PatternCatalog(Catalog, PatternMixin):
     def get_entry(self, **kwargs) -> DataSource:
         """
         Given a kwarg set, return the related catalog entry
+
+        Raises a KeyError if the entry is not found
         """
         name = self._entry_name(kwargs)
+        if not self.listable and name not in self._get_entries():
+            path = self.get_entry_path(**kwargs)
+            if not self.get_fs().exists(path):
+                raise KeyError
+
+            entry = registry[self.driver](
+                urlpath=path,
+                metadata=self.metadata,
+                storage_options=self.storage_options,
+                **self.driver_kwargs,
+            )
+            self._entries[name] = entry
+            self._kwarg_sets.append(kwargs)
         return self._get_entries()[name]
+
+    def get_fs(self):
+        if self.filesystem is None:
+            self.filesystem = url_to_fs(self._glob_path, **self.storage_options)[0]
+        return self.filesystem
 
     @reload_on_change
     def get_entry_kwarg_sets(self) -> List[Dict[str, str]]:
@@ -95,6 +116,10 @@ class PatternCatalog(Catalog, PatternMixin):
         return self.path.format(**kwargs)
 
     def _load(self, reload=False):
+        # Don't try and get all the entries for very large patterns
+        if not self.listable:
+            return
+
         if self.access is False:
             # skip first load, if cat has given name (i.e., is subcat)
             self.updated = 0
