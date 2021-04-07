@@ -1,4 +1,5 @@
-import pathlib
+from pathlib import Path
+from tempfile import TemporaryDirectory
 from time import sleep
 
 import boto3
@@ -61,7 +62,7 @@ def ttl_cat_s3_parquet(ttl_config_s3_parquet):
 
 def test_pattern_generation(empty_catalog):
     """_pattern property removes filesystem prefix and caching prefix"""
-    actual = pathlib.Path.cwd() / "{file}.csv"
+    actual = Path.cwd() / "{file}.csv"
     assert empty_catalog._pattern == str(actual)
 
 
@@ -97,3 +98,38 @@ def test_ttl_s3_parquet(ttl_cat_s3_parquet):
     assert ttl_cat_s3_parquet.get_entry_kwarg_sets() == []
     sleep(0.11)
     assert ttl_cat_s3_parquet.get_entry_kwarg_sets() == [{"num": "1"}, {"num": "2"}]
+
+
+@pytest.fixture
+def folder_with_csvs() -> str:
+    with TemporaryDirectory() as tempdir:
+        for i in range(10):
+            Path(tempdir, f"{i}.csv").touch()
+        yield str(tempdir)
+
+
+@pytest.fixture
+def ttl_config_unlistable(folder_with_csvs: str) -> dict:
+    return {
+        "path": str(Path(folder_with_csvs, "{num}.csv")),
+        "driver": "csv",
+        "ttl": -1,
+        "listable": False,
+    }
+
+
+@pytest.fixture
+def unlistable_cat(ttl_config_unlistable: dict) -> PatternCatalog:
+    return PatternCatalog.from_dict({}, **ttl_config_unlistable)
+
+
+def test_unlistable_cat(unlistable_cat: PatternCatalog):
+    assert len(list(unlistable_cat)) == 0
+    assert unlistable_cat.get_entry(num=1)
+    assert len(list(unlistable_cat)) == 1
+    assert unlistable_cat.get_entry(num=1)
+    assert len(list(unlistable_cat)) == 1
+    assert unlistable_cat.get_entry(num=5)
+    assert len(list(unlistable_cat)) == 2
+    with pytest.raises(KeyError):
+        unlistable_cat.get_entry(num=-1)
