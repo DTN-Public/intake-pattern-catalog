@@ -124,12 +124,19 @@ def unlistable_cat(ttl_config_unlistable: dict) -> PatternCatalog:
 
 
 def test_unlistable_cat(unlistable_cat: PatternCatalog):
+    # Make sure an unlistable catalog doesn't have any entries initially
     assert len(list(unlistable_cat)) == 0
+    # Make sure I can access a valid entry without error
     assert unlistable_cat.get_entry(num=1)
+    # After valid entry is accessed, make sure entries has been populated
     assert len(list(unlistable_cat)) == 1
     assert unlistable_cat.get_entry(num=1)
+    # After valid entry is accessed again, make sure entry hasn't been duplicated in list
     assert len(list(unlistable_cat)) == 1
+    # Check other valid entry
     assert unlistable_cat.get_entry(num=5)
+    # After 2 valid entries are accessed, make sure entries has been populated with 2 entries
     assert len(list(unlistable_cat)) == 2
+    # Make sure accessing invalid entry raises a KeyError
     with pytest.raises(KeyError):
         unlistable_cat.get_entry(num=-1)
