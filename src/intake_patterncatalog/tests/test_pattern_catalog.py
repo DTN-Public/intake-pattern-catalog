@@ -1,6 +1,7 @@
 from pathlib import Path
 from tempfile import TemporaryDirectory
 from time import sleep
+from typing import Generator
 
 import boto3
 import botocore.awsrequest
@@ -101,7 +102,7 @@ def test_ttl_s3_parquet(ttl_cat_s3_parquet):
 
 
 @pytest.fixture
-def folder_with_csvs() -> str:
+def folder_with_csvs() -> Generator[str, None, None]:
     with TemporaryDirectory() as tempdir:
         for i in range(10):
             Path(tempdir, f"{i}.csv").touch()
