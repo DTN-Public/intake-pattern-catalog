@@ -46,7 +46,7 @@ class PatternCatalog(Catalog, PatternMixin):
         if path == self._glob_path:
             raise ValueError("Path must contain one or more `{}` patterns.")
 
-        storage_options = kwargs.get("storage_options", {})
+        storage_options = kwargs.pop("storage_options", {})
 
         # Set use_listing_cache to False so that once the ttl runs
         # out, the fsspec cache doesn't keep the entry list from getting updated
