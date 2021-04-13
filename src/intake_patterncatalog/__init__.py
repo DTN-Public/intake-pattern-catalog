@@ -17,11 +17,11 @@ class PatternCatalog(Catalog, PatternMixin):
     partition_access = None
     name = "pattern_cat"
 
-    def __init__(self, path, driver, autoreload=True, ttl=60, **kwargs):
+    def __init__(self, urlpath, driver, autoreload=True, ttl=60, **kwargs):
         """
         Parameters
         ----------
-        path: str
+        urlpath: str
             Location of the file to parse (can be remote)
         reload: bool
             Whether to watch the source file for changes; make False if you want
@@ -29,7 +29,10 @@ class PatternCatalog(Catalog, PatternMixin):
         ttl: int
             How long to use the cached list of files before reloading.
         """
-        self.path = path
+        # This must be set to False in order to avoid the default path-as-pattern
+        # behavior
+        self.path_as_pattern = False
+        self.urlpath = urlpath
         self.text = None
         self.autoreload = autoreload  # set this to False if don't want reloads
         self.filesystem = kwargs.pop("fs", None)
@@ -42,8 +45,8 @@ class PatternCatalog(Catalog, PatternMixin):
         self._kwarg_sets: List[Dict[str, str]] = []
 
         self._loaded_once = False
-        self._glob_path = path_to_glob(path)
-        if path == self._glob_path:
+        self._glob_path = path_to_glob(urlpath)
+        if urlpath == self._glob_path:
             raise ValueError("Path must contain one or more `{}` patterns.")
 
         storage_options = kwargs.pop("storage_options", {})
@@ -59,12 +62,12 @@ class PatternCatalog(Catalog, PatternMixin):
 
     @property
     def _pattern(self):
-        if "::" not in self.path:
-            path = self.path
+        if "::" not in self.urlpath:
+            urlpath = self.urlpath
         else:
             # removes simplecache:: or similar
-            path = self.path.split("::")[1]
-        return strip_protocol(path)  # removes s3://
+            urlpath = self.path.split("::")[1]
+        return strip_protocol(urlpath)  # removes s3://
 
     @staticmethod
     def _entry_name(value_map: Mapping[str, str]) -> str:
@@ -85,12 +88,12 @@ class PatternCatalog(Catalog, PatternMixin):
         """
         name = self._entry_name(kwargs)
         if not self.listable and name not in self._get_entries():
-            path = self.get_entry_path(**kwargs)
-            if not self.get_fs().exists(path):
+            urlpath = self.get_entry_path(**kwargs)
+            if not self.get_fs().exists(urlpath):
                 raise KeyError
 
             entry = registry[self.driver](
-                urlpath=path,
+                urlpath=urlpath,
                 metadata=self.metadata,
                 storage_options=self.storage_options,
                 **self.driver_kwargs,
@@ -113,7 +116,7 @@ class PatternCatalog(Catalog, PatternMixin):
         return self._kwarg_sets
 
     def get_entry_path(self, **kwargs) -> DataSource:
-        return self.path.format(**kwargs)
+        return self.urlpath.format(**kwargs)
 
     def _load(self, reload=False):
         # Don't try and get all the entries for very large patterns
@@ -136,9 +139,9 @@ class PatternCatalog(Catalog, PatternMixin):
             for values in zip(*patterns.values()):
                 value_map = {k: v for k, v in zip(value_names, values)}
                 self._kwarg_sets.append(value_map)
-                path = self.path.format(**value_map)
+                urlpath = self.urlpath.format(**value_map)
                 entry = registry[self.driver](
-                    urlpath=path,
+                    urlpath=urlpath,
                     metadata=self.metadata,
                     storage_options=self.storage_options,
                     **self.driver_kwargs,
