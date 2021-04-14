@@ -33,17 +33,17 @@ def empty_catalog(request):
 
 @pytest.fixture
 def no_ttl_config_s3():
-    return {"path": "s3://no_ttl/{num}.csv", "driver": "csv", "ttl": -1}
+    return {"urlpath": "s3://no_ttl/{num}.csv", "driver": "csv", "ttl": -1}
 
 
 @pytest.fixture
 def ttl_config_s3():
-    return {"path": "s3://ttl/{num}.csv", "driver": "csv", "ttl": 0.1}
+    return {"urlpath": "s3://ttl/{num}.csv", "driver": "csv", "ttl": 0.1}
 
 
 @pytest.fixture
 def ttl_config_s3_parquet():
-    return {"path": "s3://ttl/{num}.parquet", "driver": "parquet", "ttl": 0.1}
+    return {"urlpath": "s3://ttl/{num}.parquet", "driver": "parquet", "ttl": 0.1}
 
 
 @pytest.fixture
@@ -112,7 +112,7 @@ def folder_with_csvs() -> Generator[str, None, None]:
 @pytest.fixture
 def ttl_config_unlistable(folder_with_csvs: str) -> dict:
     return {
-        "path": str(Path(folder_with_csvs, "{num}.csv")),
+        "urlpath": str(Path(folder_with_csvs, "{num}.csv")),
         "driver": "csv",
         "ttl": -1,
         "listable": False,

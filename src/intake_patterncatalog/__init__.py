@@ -9,7 +9,7 @@ from intake.source.base import DataSource, PatternMixin
 from intake.source.utils import path_to_glob, reverse_formats
 
 
-class PatternCatalog(Catalog, PatternMixin):
+class PatternCatalog(Catalog):
     """Catalog of entries as described by a path pattern (e.g. folder/{a}/{b}.csv)"""
 
     version = "0.0.2"
@@ -31,7 +31,6 @@ class PatternCatalog(Catalog, PatternMixin):
         """
         # This must be set to False in order to avoid the default path-as-pattern
         # behavior
-        self.path_as_pattern = False
         self.urlpath = urlpath
         self.text = None
         self.autoreload = autoreload  # set this to False if don't want reloads
@@ -66,7 +65,7 @@ class PatternCatalog(Catalog, PatternMixin):
             urlpath = self.urlpath
         else:
             # removes simplecache:: or similar
-            urlpath = self.path.split("::")[1]
+            urlpath = self.urlpath.split("::")[1]
         return strip_protocol(urlpath)  # removes s3://
 
     @staticmethod
