@@ -47,17 +47,26 @@ def ttl_config_s3_parquet():
 
 
 @pytest.fixture
+@mock_s3
 def no_ttl_cat_s3(no_ttl_config_s3):
+    s3 = boto3.client("s3", region_name="us-east-1")
+    s3.create_bucket(Bucket="no_ttl")
     return PatternCatalog.from_dict({}, **no_ttl_config_s3)
 
 
 @pytest.fixture
+@mock_s3
 def ttl_cat_s3(ttl_config_s3):
+    s3 = boto3.client("s3", region_name="us-east-1")
+    s3.create_bucket(Bucket="ttl")
     return PatternCatalog.from_dict({}, **ttl_config_s3)
 
 
 @pytest.fixture
+@mock_s3
 def ttl_cat_s3_parquet(ttl_config_s3_parquet):
+    s3 = boto3.client("s3", region_name="us-east-1")
+    s3.create_bucket(Bucket="ttl")
     return PatternCatalog.from_dict({}, **ttl_config_s3_parquet)
 
 
