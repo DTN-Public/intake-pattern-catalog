@@ -8,6 +8,8 @@ from intake.catalog.utils import reload_on_change
 from intake.source.base import DataSource, PatternMixin
 from intake.source.utils import path_to_glob, reverse_formats
 
+__version__ = "2021.4.0"
+
 
 class PatternCatalog(Catalog):
     """Catalog of entries as described by a path pattern (e.g. folder/{a}/{b}.csv)"""

@@ -1,0 +1,14 @@
+black
+bumpver
+isort
+flake8
+mypy
+pytest
+flake8-bugbear
+ipython
+intake-parquet
+yamllint
+jedi==0.17.2
+parso==0.7.1
+boto3==1.16.52
+moto[s3]

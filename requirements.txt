@@ -1,0 +1,3 @@
+fsspec>=2021.4.0
+intake
+s3fs
