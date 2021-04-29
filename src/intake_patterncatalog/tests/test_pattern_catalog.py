@@ -1,3 +1,4 @@
+import os
 from pathlib import Path
 from tempfile import TemporaryDirectory
 from time import sleep
@@ -46,18 +47,36 @@ def ttl_config_s3_parquet():
     return {"urlpath": "s3://ttl/{num}.parquet", "driver": "parquet", "ttl": 0.1}
 
 
+@pytest.fixture(scope="function")
+def aws_credentials():
+    """Mocked AWS Credentials for moto."""
+    os.environ["AWS_ACCESS_KEY_ID"] = "testing"
+    os.environ["AWS_SECRET_ACCESS_KEY"] = "testing"
+    os.environ["AWS_SECURITY_TOKEN"] = "testing"
+    os.environ["AWS_SESSION_TOKEN"] = "testing"
+
+
+@pytest.fixture(scope="function")
+def s3(aws_credentials):
+    with mock_s3():
+        yield boto3.client("s3", region_name="us-east-1")
+
+
 @pytest.fixture
-def no_ttl_cat_s3(no_ttl_config_s3):
+def no_ttl_cat_s3(s3, no_ttl_config_s3):
+    s3.create_bucket(Bucket="no_ttl")
     return PatternCatalog.from_dict({}, **no_ttl_config_s3)
 
 
 @pytest.fixture
-def ttl_cat_s3(ttl_config_s3):
+def ttl_cat_s3(ttl_config_s3, s3):
+    s3.create_bucket(Bucket="ttl")
     return PatternCatalog.from_dict({}, **ttl_config_s3)
 
 
 @pytest.fixture
-def ttl_cat_s3_parquet(ttl_config_s3_parquet):
+def ttl_cat_s3_parquet(ttl_config_s3_parquet, s3):
+    s3.create_bucket(Bucket="ttl")
     return PatternCatalog.from_dict({}, **ttl_config_s3_parquet)
 
 
@@ -67,20 +86,14 @@ def test_pattern_generation(empty_catalog):
     assert empty_catalog._pattern == str(actual)
 
 
-@mock_s3
-def test_no_ttl_s3(no_ttl_cat_s3):
-    s3 = boto3.client("s3", region_name="us-east-1")
-    s3.create_bucket(Bucket="no_ttl")
+def test_no_ttl_s3(s3, no_ttl_cat_s3):
     assert no_ttl_cat_s3.get_entry_kwarg_sets() == []
     s3.put_object(Body="", Bucket="no_ttl", Key="1.csv")
     s3.put_object(Body="", Bucket="no_ttl", Key="2.csv")
     assert no_ttl_cat_s3.get_entry_kwarg_sets() == [{"num": "1"}, {"num": "2"}]
 
 
-@mock_s3
-def test_ttl_s3(ttl_cat_s3):
-    s3 = boto3.client("s3", region_name="us-east-1")
-    s3.create_bucket(Bucket="ttl")
+def test_ttl_s3(s3, ttl_cat_s3):
     assert ttl_cat_s3.get_entry_kwarg_sets() == []
     s3.put_object(Body="", Bucket="ttl", Key="1.csv")
     s3.put_object(Body="", Bucket="ttl", Key="2.csv")
@@ -89,10 +102,7 @@ def test_ttl_s3(ttl_cat_s3):
     assert ttl_cat_s3.get_entry_kwarg_sets() == [{"num": "1"}, {"num": "2"}]
 
 
-@mock_s3
-def test_ttl_s3_parquet(ttl_cat_s3_parquet):
-    s3 = boto3.client("s3", region_name="us-east-1")
-    s3.create_bucket(Bucket="ttl")
+def test_ttl_s3_parquet(s3, ttl_cat_s3_parquet):
     assert ttl_cat_s3_parquet.get_entry_kwarg_sets() == []
     s3.put_object(Body="", Bucket="ttl", Key="1.parquet")
     s3.put_object(Body="", Bucket="ttl", Key="2.parquet")

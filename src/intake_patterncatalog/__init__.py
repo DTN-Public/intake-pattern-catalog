@@ -7,6 +7,7 @@ from intake.catalog import Catalog
 from intake.catalog.utils import reload_on_change
 from intake.source.base import DataSource, PatternMixin
 from intake.source.utils import path_to_glob, reverse_formats
+from s3fs import S3FileSystem
 
 __version__ = "2021.4.0"
 
@@ -56,7 +57,6 @@ class PatternCatalog(Catalog):
         # out, the fsspec cache doesn't keep the entry list from getting updated
         if "use_listings_cache" not in storage_options:
             storage_options["use_listings_cache"] = False
-
         super(PatternCatalog, self).__init__(
             ttl=ttl, storage_options=storage_options, **kwargs
         )
@@ -123,16 +123,23 @@ class PatternCatalog(Catalog):
         # Don't try and get all the entries for very large patterns
         if not self.listable:
             return
-
         if self.access is False:
             # skip first load, if cat has given name (i.e., is subcat)
             self.updated = 0
             self.access = True
             return
         if self.autoreload or reload:
+            try:
+                # Check for permission to inspect path before attempting to expand
+                # the glob. (Async globbing doesn't always raise exception.)
+                self.get_fs().exists(self._glob_path)
+            except PermissionError as e:
+                raise e
+
             fs, _, paths = fsspec.get_fs_token_paths(
                 self._glob_path, storage_options=self.storage_options
             )
+
             patterns: Dict[str, List[str]] = reverse_formats(self._pattern, paths)
             value_names = list(patterns.keys())
             self._entries = {}
