@@ -1,4 +1,5 @@
 black
+packaging
 isort
 flake8
 mypy
@@ -9,4 +10,7 @@ intake-parquet
 yamllint
 jedi==0.17.2
 parso==0.7.1
+boto3==1.16.52
 moto[s3]
+cruft
+GitPython
