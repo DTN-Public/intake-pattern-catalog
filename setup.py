@@ -25,7 +25,6 @@ version, cmdclass = get_version_and_cmdclass("./src/rolodata")
 
 setup(
     name="intake-patterncatalog",
-    version="2021.4.0",
     description="",
     author="Tim Hopper",
     author_email="tim.hopper@dtn.com",
