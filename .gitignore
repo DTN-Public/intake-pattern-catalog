@@ -3,6 +3,7 @@
 !.mypy.ini
 !.editorconfig
 !.gitignore
+!.pre-commit-config
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

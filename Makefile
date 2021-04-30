@@ -7,9 +7,6 @@ format: format-black format-isort
 test: venv
 	$(VENV)/pytest
 
-bump-version: venv
-	$(VENV)/bumpver update
-
 format-black: venv
 	$(VENV)/black .
 
@@ -45,4 +42,4 @@ install-hooks: .git/hooks/pre-commit .pre-commit-config.yaml
 
 include Makefile.venv.mk
 
-.PHONY: lint format format-* lint-* bump-version test clean-dist aws-login install-hooks venv
+.PHONY: lint format format-* lint-* test clean-dist aws-login install-hooks venv
