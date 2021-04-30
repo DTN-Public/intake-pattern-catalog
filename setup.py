@@ -20,7 +20,7 @@ def get_version_and_cmdclass(package_path):
     return module.__version__, module.cmdclass
 
 
-version, cmdclass = get_version_and_cmdclass("./src/rolodata")
+version, cmdclass = get_version_and_cmdclass("./src/intake_patterncatalog")
 
 
 setup(
