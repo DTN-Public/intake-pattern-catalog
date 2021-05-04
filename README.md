@@ -1,4 +1,65 @@
 # Intake Pattern Catalog
 
-A Pattern Catalog is an internal Intake extension for generating a catalog (a collection
-of datasets) based on pattern matching S3 paths.
+intake-patterncatalog is a [plugin](https://intake.readthedocs.io/en/latest/plugin-directory.html) for Intake
+which allows you to specify a pattern which represents a number of different entries. Note that this is different from the patterns you can write with the csv driver which get turned into a single entry.
+
+Use `driver: pattern_cat` to use this driver in your catalogs.
+
+Consider the following list of files in an S3 bucket:
+
+* bucket-name/folder/a_1.csv
+* bucket-name/folder/b_1.csv
+* bucket-name/folder/c_1.csv
+* bucket-name/folder/a_2.csv
+* bucket-name/folder/b_2.csv
+
+And the following catalog definition yaml file:
+```yaml
+---
+metadata:
+  version: 1
+sources:
+  stuff:
+    description: Stuff and things
+    driver: pattern_cat
+    args:
+      path: "s3://bucket-name/folder/{foo}_{bar}.csv"
+      driver: csv
+```
+
+## Catalog API
+
+### Access entry by kwargs:
+```python
+> catalog.stuff.get_entry(foo='a', bar=1)
+sources:
+  foo_a_bar_1:
+    args:
+      storage_options:
+        use_listings_cache: false
+      urlpath: s3://bucket-name/folder/a_1.csv
+    description: ''
+    driver: intake.source.csv.CSVSource
+    metadata:
+      catalog_dir: ...
+```
+_Note that this could also be accessed with `catalog.stuff.foo_a_bar_1`_
+
+### See all valid kwarg combinations:
+```python
+> catalog.stuff.get_entry_kwarg_sets()
+[
+    {"foo": "a", "bar": "1"},
+    {"foo": "b", "bar": "1"},
+    {"foo": "c", "bar": "1"},
+    {"foo": "a", "bar": "2"},
+    {"foo": "b", "bar": "2"},
+]
+```
+
+## Caching
+
+The default way of controlling any caching with a pattern-catalog is using a `ttl` (in seconds),
+which is an optional value under `args` which specifies how long should wait after fetching a list of files
+which match the pattern before it loads them again. The default `ttl` is 60 seconds.
+If you want to force it to always get the latest list of available entries, set the `ttl` to 0.
