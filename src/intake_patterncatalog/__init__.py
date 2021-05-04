@@ -7,9 +7,15 @@ from intake.catalog import Catalog
 from intake.catalog.utils import reload_on_change
 from intake.source.base import DataSource, PatternMixin
 from intake.source.utils import path_to_glob, reverse_formats
-from s3fs import S3FileSystem
 
-__version__ = "2021.4.0"
+from ._version import __version__
+
+try:
+    # Hack thing from miniver to avoid confusion
+    # with __version__
+    del _version  # type: ignore # noqa
+except AttributeError:
+    pass
 
 
 class PatternCatalog(Catalog):
