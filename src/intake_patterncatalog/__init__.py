@@ -126,7 +126,6 @@ class PatternCatalog(Catalog):
         return self.urlpath.format(**kwargs)
 
     def _load(self, reload=False):
-        print("CALLING LOAD!!!!!!!!!!!!!!!!!!")
         # Don't try and get all the entries for very large patterns
         if not self.listable:
             return
