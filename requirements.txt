@@ -2,3 +2,4 @@ fsspec>=2021.4.0
 intake
 s3fs
 boto3==1.17.49
+msgpack
