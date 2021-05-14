@@ -14,7 +14,7 @@ try:
     # Hack thing from miniver to avoid confusion
     # with __version__
     del _version  # type: ignore # noqa
-except AttributeError:
+except (AttributeError, NameError):
     pass
 
 
@@ -142,9 +142,7 @@ class PatternCatalog(Catalog):
             except PermissionError as e:
                 raise e
 
-            fs, _, paths = fsspec.get_fs_token_paths(
-                self._glob_path, storage_options=self.storage_options
-            )
+            paths = self.get_fs().glob(self._glob_path)
 
             patterns: Dict[str, List[str]] = reverse_formats(self._pattern, paths)
             value_names = list(patterns.keys())
