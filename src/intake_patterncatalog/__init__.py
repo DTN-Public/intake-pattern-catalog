@@ -38,8 +38,6 @@ class PatternCatalog(Catalog):
         ttl: int
             How long to use the cached list of files before reloading.
         """
-        # This must be set to False in order to avoid the default path-as-pattern
-        # behavior
         self.urlpath = urlpath
         self.text = None
         self.autoreload = autoreload  # set this to False if don't want reloads
