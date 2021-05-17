@@ -23,7 +23,7 @@ sources:
     description: Stuff and things
     driver: pattern_cat
     args:
-      path: "s3://bucket-name/folder/{foo}_{bar}.csv"
+      urlpath: "s3://bucket-name/folder/{foo}_{bar}.csv"
       driver: csv
 ```
 
