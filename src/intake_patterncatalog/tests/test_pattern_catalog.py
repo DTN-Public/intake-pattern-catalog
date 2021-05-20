@@ -154,52 +154,38 @@ def test_unlistable_cat(unlistable_cat: PatternCatalog):
 
 
 @pytest.fixture
-def recursive_s3():
-    return {
-        "urlpath": "s3://recursive/{path}.csv",
-        "driver": "csv",
-        "ttl": -1,
-        "recursive_glob": True,
-    }
+def recursive_s3(s3) -> str:
+    bucket_name = "recursive"
+    s3.create_bucket(Bucket=bucket_name)
+    s3.put_object(Body="", Bucket=bucket_name, Key="nested/path/1.csv")
+    s3.put_object(Body="", Bucket=bucket_name, Key="nested/path/2.csv")
+    s3.put_object(Body="", Bucket=bucket_name, Key="3.csv")
+    return "s3://" + bucket_name + "/{path}.csv"
 
 
-@pytest.fixture
-def cat_recursive_s3(recursive_s3, s3):
-    s3.create_bucket(Bucket="recursive")
-    s3.put_object(Body="", Bucket="recursive", Key="nested/path/1.csv")
-    s3.put_object(Body="", Bucket="recursive", Key="nested/path/2.csv")
-    s3.put_object(Body="", Bucket="recursive", Key="3.csv")
-    return PatternCatalog.from_dict({}, **recursive_s3)
-
-
-def test_recursive_s3(cat_recursive_s3):
-    assert cat_recursive_s3.get_entry_kwarg_sets() == [
+def test_recursive_s3(recursive_s3: str):
+    cat = PatternCatalog.from_dict(
+        {},
+        urlpath=recursive_s3,
+        driver="csv",
+        ttl=-1,
+        recursive_glob=True,
+    )
+    assert cat.get_entry_kwarg_sets() == [
         {"path": "3"},
         {"path": "nested/path/1"},
         {"path": "nested/path/2"},
     ]
 
 
-@pytest.fixture
-def non_recursive_s3():
-    return {
-        "urlpath": "s3://non_recursive/{path}.csv",
-        "driver": "csv",
-        "ttl": -1,
-        "recursive_glob": False,
-    }
-
-
-@pytest.fixture
-def cat_non_recursive_s3(non_recursive_s3, s3):
-    s3.create_bucket(Bucket="non_recursive")
-    s3.put_object(Body="", Bucket="non_recursive", Key="nested/path/1.csv")
-    s3.put_object(Body="", Bucket="non_recursive", Key="nested/path/2.csv")
-    s3.put_object(Body="", Bucket="non_recursive", Key="3.csv")
-    return PatternCatalog.from_dict({}, **non_recursive_s3)
-
-
-def test_non_recursive_s3(cat_non_recursive_s3):
-    assert cat_non_recursive_s3.get_entry_kwarg_sets() == [
+def test_non_recursive_s3(recursive_s3: str):
+    cat = PatternCatalog.from_dict(
+        {},
+        urlpath=recursive_s3,
+        driver="csv",
+        ttl=-1,
+        recursive_glob=False,
+    )
+    assert cat.get_entry_kwarg_sets() == [
         {"path": "3"},
     ]
