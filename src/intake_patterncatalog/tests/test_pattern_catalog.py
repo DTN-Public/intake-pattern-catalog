@@ -164,11 +164,9 @@ def recursive_s3(s3) -> str:
 
 
 def test_recursive_s3(recursive_s3: str):
-    cat = PatternCatalog.from_dict(
-        {},
+    cat = PatternCatalog(
         urlpath=recursive_s3,
         driver="csv",
-        ttl=-1,
         recursive_glob=True,
     )
     assert cat.get_entry_kwarg_sets() == [
@@ -179,11 +177,9 @@ def test_recursive_s3(recursive_s3: str):
 
 
 def test_non_recursive_s3(recursive_s3: str):
-    cat = PatternCatalog.from_dict(
-        {},
+    cat = PatternCatalog(
         urlpath=recursive_s3,
         driver="csv",
-        ttl=-1,
         recursive_glob=False,
     )
     assert cat.get_entry_kwarg_sets() == [
