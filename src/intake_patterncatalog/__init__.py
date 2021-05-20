@@ -26,17 +26,35 @@ class PatternCatalog(Catalog):
     partition_access = None
     name = "pattern_cat"
 
-    def __init__(self, urlpath, driver, autoreload=True, ttl=60, **kwargs):
+    def __init__(
+        self,
+        urlpath: str,
+        driver: str,
+        autoreload: bool = True,
+        ttl: int = 60,
+        recursive_glob: bool = False,
+        listable: bool = True,
+        **kwargs,
+    ):
         """
         Parameters
         ----------
         urlpath: str
             Location of the file to parse (can be remote)
+        driver: str
+            What driver to use for each entry in the catalog (e.g. "csv")
         reload: bool
             Whether to watch the source file for changes; make False if you want
             an editable Catalog
         ttl: int
             How long to use the cached list of files before reloading.
+        listable: bool
+            Whether or not to construct a list of all the matching entries when the
+            catalog is instantiated
+        recursive_glob: bool
+            Whether or not to search in nested folders to look for matching items
+            (replaces * with ** for globbing purposes). Necessary if one of the pattern
+            items has `/`'s in it.
         """
         self.urlpath = urlpath
         self.text = None
@@ -45,13 +63,16 @@ class PatternCatalog(Catalog):
         self.driver_kwargs = kwargs.pop("driver_kwargs", {})
         self.access = "name" not in kwargs
         self.driver = driver
-        self.listable = kwargs.pop("listable", True)
+        self.listable = listable
+        self.recursive_glob = recursive_glob
         self.metadata = kwargs.get("metadata", {})
 
         self._kwarg_sets: List[Dict[str, str]] = []
 
         self._loaded_once = False
         self._glob_path = path_to_glob(urlpath)
+        if self.recursive_glob:
+            self._glob_path = self._glob_path.replace("*", "**")
         if urlpath == self._glob_path:
             raise ValueError("Path must contain one or more `{}` patterns.")
 
