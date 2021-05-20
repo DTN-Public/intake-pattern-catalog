@@ -24,7 +24,7 @@ version, cmdclass = get_version_and_cmdclass("./src/intake_patterncatalog")
 
 
 setup(
-    name="intake-patterncatalog",
+    name="dtn-intake-patterncatalog",
     description="",
     author="Tim Hopper",
     author_email="tim.hopper@dtn.com",
