@@ -32,21 +32,6 @@ def empty_catalog(request):
     return PatternCatalog(request.param, driver="csv")
 
 
-@pytest.fixture
-def no_ttl_config_s3():
-    return {"urlpath": "s3://no_ttl/{num}.csv", "driver": "csv", "ttl": -1}
-
-
-@pytest.fixture
-def ttl_config_s3():
-    return {"urlpath": "s3://ttl/{num}.csv", "driver": "csv", "ttl": 0.1}
-
-
-@pytest.fixture
-def ttl_config_s3_parquet():
-    return {"urlpath": "s3://ttl/{num}.parquet", "driver": "parquet", "ttl": 0.1}
-
-
 @pytest.fixture(scope="function")
 def aws_credentials():
     """Mocked AWS Credentials for moto."""
@@ -62,22 +47,11 @@ def s3(aws_credentials):
         yield boto3.client("s3", region_name="us-east-1")
 
 
-@pytest.fixture
-def no_ttl_cat_s3(s3, no_ttl_config_s3):
-    s3.create_bucket(Bucket="no_ttl")
-    return PatternCatalog.from_dict({}, **no_ttl_config_s3)
-
-
-@pytest.fixture
-def ttl_cat_s3(ttl_config_s3, s3):
-    s3.create_bucket(Bucket="ttl")
-    return PatternCatalog.from_dict({}, **ttl_config_s3)
-
-
-@pytest.fixture
-def ttl_cat_s3_parquet(ttl_config_s3_parquet, s3):
-    s3.create_bucket(Bucket="ttl")
-    return PatternCatalog.from_dict({}, **ttl_config_s3_parquet)
+@pytest.fixture(scope="function")
+def example_bucket(s3):
+    bucket_name = "example-bucket"
+    s3.create_bucket(Bucket=bucket_name)
+    return bucket_name
 
 
 def test_pattern_generation(empty_catalog):
@@ -86,29 +60,44 @@ def test_pattern_generation(empty_catalog):
     assert empty_catalog._pattern == str(actual)
 
 
-def test_no_ttl_s3(s3, no_ttl_cat_s3):
-    assert no_ttl_cat_s3.get_entry_kwarg_sets() == []
-    s3.put_object(Body="", Bucket="no_ttl", Key="1.csv")
-    s3.put_object(Body="", Bucket="no_ttl", Key="2.csv")
-    assert no_ttl_cat_s3.get_entry_kwarg_sets() == [{"num": "1"}, {"num": "2"}]
+def test_no_ttl_s3(example_bucket, s3):
+    cat = PatternCatalog(
+        urlpath="s3://" + example_bucket + "/{num}.csv",
+        driver="csv",
+        ttl=-1,
+    )
+    assert cat.get_entry_kwarg_sets() == []
+    s3.put_object(Body="", Bucket=example_bucket, Key="1.csv")
+    s3.put_object(Body="", Bucket=example_bucket, Key="2.csv")
+    assert cat.get_entry_kwarg_sets() == [{"num": "1"}, {"num": "2"}]
 
 
-def test_ttl_s3(s3, ttl_cat_s3):
-    assert ttl_cat_s3.get_entry_kwarg_sets() == []
-    s3.put_object(Body="", Bucket="ttl", Key="1.csv")
-    s3.put_object(Body="", Bucket="ttl", Key="2.csv")
-    assert ttl_cat_s3.get_entry_kwarg_sets() == []
+def test_ttl_s3(example_bucket, s3):
+    cat = PatternCatalog(
+        urlpath="s3://" + example_bucket + "/{num}.csv",
+        driver="csv",
+        ttl=0.1,
+    )
+    assert cat.get_entry_kwarg_sets() == []
+    s3.put_object(Body="", Bucket=example_bucket, Key="1.csv")
+    s3.put_object(Body="", Bucket=example_bucket, Key="2.csv")
+    assert cat.get_entry_kwarg_sets() == []
     sleep(0.11)
-    assert ttl_cat_s3.get_entry_kwarg_sets() == [{"num": "1"}, {"num": "2"}]
+    assert cat.get_entry_kwarg_sets() == [{"num": "1"}, {"num": "2"}]
 
 
-def test_ttl_s3_parquet(s3, ttl_cat_s3_parquet):
-    assert ttl_cat_s3_parquet.get_entry_kwarg_sets() == []
-    s3.put_object(Body="", Bucket="ttl", Key="1.parquet")
-    s3.put_object(Body="", Bucket="ttl", Key="2.parquet")
-    assert ttl_cat_s3_parquet.get_entry_kwarg_sets() == []
+def test_ttl_s3_parquet(example_bucket, s3):
+    cat = PatternCatalog(
+        urlpath="s3://" + example_bucket + "/{num}.parquet",
+        driver="parquet",
+        ttl=0.1,
+    )
+    assert cat.get_entry_kwarg_sets() == []
+    s3.put_object(Body="", Bucket=example_bucket, Key="1.parquet")
+    s3.put_object(Body="", Bucket=example_bucket, Key="2.parquet")
+    assert cat.get_entry_kwarg_sets() == []
     sleep(0.11)
-    assert ttl_cat_s3_parquet.get_entry_kwarg_sets() == [{"num": "1"}, {"num": "2"}]
+    assert cat.get_entry_kwarg_sets() == [{"num": "1"}, {"num": "2"}]
 
 
 @pytest.fixture
@@ -119,38 +108,28 @@ def folder_with_csvs() -> Generator[str, None, None]:
         yield str(tempdir)
 
 
-@pytest.fixture
-def ttl_config_unlistable(folder_with_csvs: str) -> dict:
-    return {
-        "urlpath": str(Path(folder_with_csvs, "{num}.csv")),
-        "driver": "csv",
-        "ttl": -1,
-        "listable": False,
-    }
-
-
-@pytest.fixture
-def unlistable_cat(ttl_config_unlistable: dict) -> PatternCatalog:
-    return PatternCatalog.from_dict({}, **ttl_config_unlistable)
-
-
-def test_unlistable_cat(unlistable_cat: PatternCatalog):
+def test_unlistable_cat(folder_with_csvs: str):
+    cat = PatternCatalog(
+        urlpath=str(Path(folder_with_csvs, "{num}.csv")),
+        driver="csv",
+        listable=False,
+    )
     # Make sure an unlistable catalog doesn't have any entries initially
-    assert len(list(unlistable_cat)) == 0
+    assert len(list(cat)) == 0
     # Make sure I can access a valid entry without error
-    assert unlistable_cat.get_entry(num=1)
+    assert cat.get_entry(num=1)
     # After valid entry is accessed, make sure entries has been populated
-    assert len(list(unlistable_cat)) == 1
-    assert unlistable_cat.get_entry(num=1)
+    assert len(list(cat)) == 1
+    assert cat.get_entry(num=1)
     # After valid entry is accessed again, make sure entry hasn't been duplicated in list
-    assert len(list(unlistable_cat)) == 1
+    assert len(list(cat)) == 1
     # Check other valid entry
-    assert unlistable_cat.get_entry(num=5)
+    assert cat.get_entry(num=5)
     # After 2 valid entries are accessed, make sure entries has been populated with 2 entries
-    assert len(list(unlistable_cat)) == 2
+    assert len(list(cat)) == 2
     # Make sure accessing invalid entry raises a KeyError
     with pytest.raises(KeyError):
-        unlistable_cat.get_entry(num=-1)
+        cat.get_entry(num=-1)
 
 
 @pytest.fixture
