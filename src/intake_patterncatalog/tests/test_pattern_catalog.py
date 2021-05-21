@@ -130,3 +130,37 @@ def test_unlistable_cat(folder_with_csvs: str):
     # Make sure accessing invalid entry raises a KeyError
     with pytest.raises(KeyError):
         cat.get_entry(num=-1)
+
+
+@pytest.fixture
+def recursive_s3(s3) -> str:
+    bucket_name = "recursive"
+    s3.create_bucket(Bucket=bucket_name)
+    s3.put_object(Body="", Bucket=bucket_name, Key="nested/path/1.csv")
+    s3.put_object(Body="", Bucket=bucket_name, Key="nested/path/2.csv")
+    s3.put_object(Body="", Bucket=bucket_name, Key="3.csv")
+    return "s3://" + bucket_name + "/{path}.csv"
+
+
+def test_recursive_s3(recursive_s3: str):
+    cat = PatternCatalog(
+        urlpath=recursive_s3,
+        driver="csv",
+        recursive_glob=True,
+    )
+    assert cat.get_entry_kwarg_sets() == [
+        {"path": "3"},
+        {"path": "nested/path/1"},
+        {"path": "nested/path/2"},
+    ]
+
+
+def test_non_recursive_s3(recursive_s3: str):
+    cat = PatternCatalog(
+        urlpath=recursive_s3,
+        driver="csv",
+        recursive_glob=False,
+    )
+    assert cat.get_entry_kwarg_sets() == [
+        {"path": "3"},
+    ]
