@@ -9,7 +9,7 @@ from intake_patterncatalog import PatternCatalog
 
 
 @pytest.fixture(
-    params=["file://./{file}.csv", "simplecache::file://./{file}.csv", "./{file}.csv"]
+    params=["file://{file}.csv", "simplecache::file://{file}.csv", "{file}.csv"]
 )
 def empty_catalog(request):
     return PatternCatalog(request.param, driver="csv")
