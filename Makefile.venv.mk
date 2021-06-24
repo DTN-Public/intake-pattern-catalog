@@ -133,15 +133,11 @@ ifneq ($(wildcard setup.cfg),)
 VENVDEPENDS+=setup.cfg
 endif
 
-$(VENVDIR)/pip.conf: | $(VENV)
-	cp .pip.conf $(VENVDIR)/pip.conf
-
-
 $(VENV):
 	$(PY) -m venv $(VENVDIR)
 	$(VENV)/python -m pip install --upgrade pip setuptools wheel
 
-$(VENV)/$(MARKER): $(VENVDEPENDS) $(VENVDIR)/pip.conf
+$(VENV)/$(MARKER): $(VENVDEPENDS) | $(VENV)
 ifneq ($(strip $(REQUIREMENTS_TXT)),)
 	$(VENV)/pip install $(foreach path,$(REQUIREMENTS_TXT),-r $(path))
 endif
