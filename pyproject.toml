@@ -23,9 +23,6 @@ exclude = '''
 include = '\.pyi?$'
 line-length = 88
 
-[tool.pytest.ini_options]
-testpaths = ["tests"]
-
 [tool.mypy]
 files = [
   "src/**/*.py",
