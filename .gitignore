@@ -1,9 +1,11 @@
 !.cruft.json
+!.yamllint.yaml
 !.flake8
 !.mypy.ini
 !.editorconfig
 !.gitignore
 !.pre-commit-config
+!.pip.conf
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
