@@ -1,5 +1,4 @@
 !.cruft.json
-!.yamllint.yaml
 !.flake8
 !.mypy.ini
 !.editorconfig
