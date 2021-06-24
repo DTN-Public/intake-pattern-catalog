@@ -4,7 +4,7 @@ line_length = 88
 skip = ["./.venv", "./direnv", ".env"]
 
 [tool.cruft]
-skip = ["src", "tests", ".git", ".mypy_cache", ".venv", ".direnv", ".env"]
+skip = ["tests", ".git", ".mypy_cache", ".venv", ".direnv", ".env"]
 
 [tool.black]
 line-length = 88
