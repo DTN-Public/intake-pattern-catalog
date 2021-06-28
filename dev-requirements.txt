@@ -13,3 +13,4 @@ parso==0.7.1
 moto[s3]
 cruft
 GitPython
+pdbpp
