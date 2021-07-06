@@ -20,7 +20,6 @@ except (AttributeError, NameError):
 class PatternCatalog(Catalog):
     """Catalog of entries as described by a path pattern (e.g. folder/{a}/{b}.csv)"""
 
-    version = "0.0.2"
     container = "catalog"
     partition_access = None
     name = "pattern_cat"
