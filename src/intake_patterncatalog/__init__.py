@@ -1,11 +1,10 @@
 from typing import Dict, List, Mapping
 
-import fsspec
 from fsspec.core import strip_protocol, url_to_fs
 from intake import registry
 from intake.catalog import Catalog
 from intake.catalog.utils import reload_on_change
-from intake.source.base import DataSource, PatternMixin
+from intake.source.base import DataSource
 from intake.source.utils import path_to_glob, reverse_formats
 
 from ._version import __version__
