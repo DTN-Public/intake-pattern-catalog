@@ -41,18 +41,18 @@ class PatternCatalog(Catalog):
             Location of the file to parse (can be remote)
         driver: str
             What driver to use for each entry in the catalog (e.g. "csv")
-        reload: bool
+        autoreload: bool
             Whether to watch the source file for changes; make False if you want
             an editable Catalog
         ttl: int
             How long to use the cached list of files before reloading.
-        listable: bool
-            Whether or not to construct a list of all the matching entries when the
-            catalog is instantiated
         recursive_glob: bool
             Whether or not to search in nested folders to look for matching items
             (replaces * with ** for globbing purposes). Necessary if one of the pattern
             items has `/`'s in it.
+        listable: bool
+            Whether or not to construct a list of all the matching entries when the
+            catalog is instantiated
         """
         self.urlpath = urlpath
         self.text = None
