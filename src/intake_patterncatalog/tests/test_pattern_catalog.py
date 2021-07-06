@@ -132,3 +132,15 @@ def test_non_recursive_s3(recursive_s3: str):
     assert cat.get_entry_kwarg_sets() == [
         {"path": "3"},
     ]
+
+
+def test_warn_on_duplicates(example_bucket, s3):
+    s3.put_object(Body="", Bucket=example_bucket, Key="🧨.csv")
+    s3.put_object(Body="", Bucket=example_bucket, Key="💣.csv")
+    with pytest.warns(UserWarning, match="failed to generate an entry"):
+        cat = PatternCatalog(
+            urlpath="s3://" + example_bucket + "/{num}.csv",
+            driver="csv",
+            autoreload=True,
+        )
+    assert len(cat) == 1

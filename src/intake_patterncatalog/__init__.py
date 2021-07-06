@@ -1,3 +1,4 @@
+import warnings
 from typing import Dict, List, Mapping
 
 from fsspec.core import strip_protocol, url_to_fs
@@ -178,5 +179,12 @@ class PatternCatalog(Catalog):
 
                 entry._catalog = self
                 entry.name = PatternCatalog._entry_name(value_map)
+                if entry.name in self._entries:
+                    warnings.warn(
+                        "intake-patterncatalog failed to generate an entry for "
+                        f"pattern {value_map} because non-alphanumeric characters "
+                        f"are converted to underscores."
+                    )
+                    continue
                 self._entries[entry.name] = entry
                 entry._filesystem = self.filesystem
