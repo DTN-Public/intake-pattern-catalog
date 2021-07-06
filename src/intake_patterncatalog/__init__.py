@@ -98,7 +98,7 @@ class PatternCatalog(Catalog):
         name = "_".join(f"{k}_{v}" for k, v in value_map.items() if v is not None)
 
         # Replace all non-alphanumeric characters with _
-        name = "".join([c if c.isalnum() else "_" for c in name])
+        name = "".join(c if c.isalnum() else "_" for c in name)
 
         # Ensure this is a valid python identifier
         assert name.isidentifier()
@@ -110,7 +110,7 @@ class PatternCatalog(Catalog):
 
         Raises a KeyError if the entry is not found
         """
-        name = self._entry_name(kwargs)
+        name = PatternCatalog._entry_name(kwargs)
         if not self.listable and name not in self._get_entries():
             urlpath = self.get_entry_path(**kwargs)
             if not self.get_fs().exists(urlpath):
