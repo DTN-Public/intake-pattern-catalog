@@ -2,7 +2,7 @@ black
 packaging
 isort
 flake8
-mypy
+mypy>=0.910
 pytest
 flake8-bugbear
 ipython
