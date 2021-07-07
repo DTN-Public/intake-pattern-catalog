@@ -3,7 +3,7 @@ from typing import Dict, List, Mapping
 
 from fsspec.core import strip_protocol, url_to_fs
 from intake import registry
-from intake.catalog import Catalog
+from intake.catalog import Catalog, local
 from intake.catalog.utils import reload_on_change
 from intake.source.base import DataSource
 from intake.source.utils import path_to_glob, reverse_formats
@@ -116,12 +116,16 @@ class PatternCatalog(Catalog):
             urlpath = self.get_entry_path(**kwargs)
             if not self.get_fs().exists(urlpath):
                 raise KeyError
-
-            entry = registry[self.driver](
-                urlpath=urlpath,
+            entry = local.LocalCatalogEntry(
+                name=name,
+                description=self.description,
+                driver=self.driver,
                 metadata=self.metadata,
-                storage_options=self.storage_options,
-                **self.driver_kwargs,
+                args={
+                    "urlpath": urlpath,
+                    **self.driver_kwargs,
+                    "storage_options": self.storage_options,
+                },
             )
             self._entries[name] = entry
             self._kwarg_sets.append(kwargs)
