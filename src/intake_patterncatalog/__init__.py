@@ -1,11 +1,11 @@
+import warnings
 from typing import Dict, List, Mapping
 
-import fsspec
 from fsspec.core import strip_protocol, url_to_fs
 from intake import registry
 from intake.catalog import Catalog
 from intake.catalog.utils import reload_on_change
-from intake.source.base import DataSource, PatternMixin
+from intake.source.base import DataSource
 from intake.source.utils import path_to_glob, reverse_formats
 
 from ._version import __version__
@@ -21,7 +21,6 @@ except (AttributeError, NameError):
 class PatternCatalog(Catalog):
     """Catalog of entries as described by a path pattern (e.g. folder/{a}/{b}.csv)"""
 
-    version = "0.0.2"
     container = "catalog"
     partition_access = None
     name = "pattern_cat"
@@ -43,18 +42,18 @@ class PatternCatalog(Catalog):
             Location of the file to parse (can be remote)
         driver: str
             What driver to use for each entry in the catalog (e.g. "csv")
-        reload: bool
+        autoreload: bool
             Whether to watch the source file for changes; make False if you want
             an editable Catalog
         ttl: int
             How long to use the cached list of files before reloading.
-        listable: bool
-            Whether or not to construct a list of all the matching entries when the
-            catalog is instantiated
         recursive_glob: bool
             Whether or not to search in nested folders to look for matching items
             (replaces * with ** for globbing purposes). Necessary if one of the pattern
             items has `/`'s in it.
+        listable: bool
+            Whether or not to construct a list of all the matching entries when the
+            catalog is instantiated
         """
         self.urlpath = urlpath
         self.text = None
@@ -100,7 +99,7 @@ class PatternCatalog(Catalog):
         name = "_".join(f"{k}_{v}" for k, v in value_map.items() if v is not None)
 
         # Replace all non-alphanumeric characters with _
-        name = "".join([c if c.isalnum() else "_" for c in name])
+        name = "".join(c if c.isalnum() else "_" for c in name)
 
         # Ensure this is a valid python identifier
         assert name.isidentifier()
@@ -112,7 +111,7 @@ class PatternCatalog(Catalog):
 
         Raises a KeyError if the entry is not found
         """
-        name = self._entry_name(kwargs)
+        name = PatternCatalog._entry_name(kwargs)
         if not self.listable and name not in self._get_entries():
             urlpath = self.get_entry_path(**kwargs)
             if not self.get_fs().exists(urlpath):
@@ -180,5 +179,13 @@ class PatternCatalog(Catalog):
 
                 entry._catalog = self
                 entry.name = PatternCatalog._entry_name(value_map)
+                if entry.name in self._entries:
+                    warnings.warn(
+                        "intake-patterncatalog failed to generate an entry for "
+                        f"pattern {value_map} because entry named {entry.name} "
+                        "already exists. (Non-alphanumeric characters "
+                        "are converted to underscores by Pattern Catalog driver.)"
+                    )
+                    continue
                 self._entries[entry.name] = entry
                 entry._filesystem = self.filesystem
