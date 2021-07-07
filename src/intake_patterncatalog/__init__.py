@@ -129,7 +129,7 @@ class PatternCatalog(Catalog):
             )
             self._entries[name] = entry
             self._kwarg_sets.append(kwargs)
-        return self._get_entries()[name]
+        return self._get_entries()[name].get()
 
     def get_fs(self):
         if self.filesystem is None:
