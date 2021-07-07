@@ -182,8 +182,9 @@ class PatternCatalog(Catalog):
                 if entry.name in self._entries:
                     warnings.warn(
                         "intake-patterncatalog failed to generate an entry for "
-                        f"pattern {value_map} because non-alphanumeric characters "
-                        f"are converted to underscores."
+                        f"pattern {value_map} because entry named {entry.name} "
+                        "already exists. (Non-alphanumeric characters "
+                        f"are converted to underscores by Pattern Catalog driver.)"
                     )
                     continue
                 self._entries[entry.name] = entry
