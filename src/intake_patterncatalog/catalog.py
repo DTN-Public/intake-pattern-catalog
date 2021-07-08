@@ -7,7 +7,7 @@ from intake.catalog.utils import reload_on_change
 from intake.source.base import DataSource
 from intake.source.utils import path_to_glob, reverse_formats
 
-from ._version import __version__
+from ._version import __version__  # noqa
 
 try:
     # Hack thing from miniver to avoid confusion
