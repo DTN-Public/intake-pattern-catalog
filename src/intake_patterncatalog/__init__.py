@@ -59,7 +59,6 @@ class PatternCatalog(Catalog):
         self.autoreload = autoreload  # set this to False if don't want reloads
         self.filesystem = kwargs.pop("fs", None)
         self.driver_kwargs = kwargs.pop("driver_kwargs", {})
-        self.access = "name" not in kwargs
         self.driver = driver
         self.listable = listable
         self.recursive_glob = recursive_glob
@@ -67,7 +66,6 @@ class PatternCatalog(Catalog):
 
         self._kwarg_sets: List[Dict[str, str]] = []
 
-        self._loaded_once = False
         self._glob_path = path_to_glob(urlpath)
         if self.recursive_glob:
             self._glob_path = self._glob_path.replace("*", "**")
@@ -159,11 +157,6 @@ class PatternCatalog(Catalog):
     def _load(self, reload=False):
         # Don't try and get all the entries for very large patterns
         if not self.listable:
-            return
-        if self.access is False:
-            # skip first load, if cat has given name (i.e., is subcat)
-            self.updated = 0
-            self.access = True
             return
         if self.autoreload or reload:
             try:
