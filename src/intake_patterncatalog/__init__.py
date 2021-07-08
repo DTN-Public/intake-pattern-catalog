@@ -1,8 +1,7 @@
 import warnings
-from typing import Any, Dict, Iterable, List, Mapping
+from typing import Any, Dict, List, Mapping
 
 from fsspec.core import strip_protocol, url_to_fs
-from intake import registry
 from intake.catalog import Catalog, local
 from intake.catalog.utils import reload_on_change
 from intake.source.base import DataSource
@@ -27,7 +26,6 @@ class PatternCatalog(Catalog):
 
     def __init__(
         self,
-        name: str,
         urlpath: str,
         driver: str,
         autoreload: bool = True,
@@ -39,8 +37,6 @@ class PatternCatalog(Catalog):
         """
         Parameters
         ----------
-        name: str
-            Name of the catalog
         urlpath: str
             Location of the file to parse (can be remote)
         driver: str
@@ -58,13 +54,11 @@ class PatternCatalog(Catalog):
             Whether or not to construct a list of all the matching entries when the
             catalog is instantiated
         """
-        self.name = name
         self.urlpath = urlpath
         self.text = None
         self.autoreload = autoreload  # set this to False if don't want reloads
         self.filesystem = kwargs.pop("fs", None)
         self.driver_kwargs = kwargs.pop("driver_kwargs", {})
-        self.access = "name" not in kwargs
         self.driver = driver
         self.listable = listable
         self.recursive_glob = recursive_glob
@@ -72,7 +66,6 @@ class PatternCatalog(Catalog):
 
         self._kwarg_sets: List[Dict[str, str]] = []
 
-        self._loaded_once = False
         self._glob_path = path_to_glob(urlpath)
         if self.recursive_glob:
             self._glob_path = self._glob_path.replace("*", "**")
@@ -86,7 +79,7 @@ class PatternCatalog(Catalog):
         if "use_listings_cache" not in storage_options:
             storage_options["use_listings_cache"] = False
         super(PatternCatalog, self).__init__(
-            name=name, ttl=ttl, storage_options=storage_options, **kwargs
+            ttl=ttl, storage_options=storage_options, **kwargs
         )
 
     @property
@@ -164,11 +157,6 @@ class PatternCatalog(Catalog):
     def _load(self, reload=False):
         # Don't try and get all the entries for very large patterns
         if not self.listable:
-            return
-        if self.access is False:
-            # skip first load, if cat has given name (i.e., is subcat)
-            self.updated = 0
-            self.access = True
             return
         if self.autoreload or reload:
             try:
