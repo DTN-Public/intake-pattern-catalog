@@ -7,15 +7,6 @@ from intake.catalog.utils import reload_on_change
 from intake.source.base import DataSource
 from intake.source.utils import path_to_glob, reverse_formats
 
-from ._version import __version__  # noqa
-
-try:
-    # Hack thing from miniver to avoid confusion
-    # with __version__
-    del _version  # type: ignore # noqa
-except (AttributeError, NameError):
-    pass
-
 
 class PatternCatalog(Catalog):
     """Catalog of entries as described by a path pattern (e.g. folder/{a}/{b}.csv)"""
