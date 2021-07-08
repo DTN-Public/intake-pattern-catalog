@@ -1,9 +1,9 @@
 import warnings
-from typing import Dict, List, Mapping
+from typing import Any, Dict, Iterable, List, Mapping
 
 from fsspec.core import strip_protocol, url_to_fs
 from intake import registry
-from intake.catalog import Catalog
+from intake.catalog import Catalog, local
 from intake.catalog.utils import reload_on_change
 from intake.source.base import DataSource
 from intake.source.utils import path_to_glob, reverse_formats
@@ -27,6 +27,7 @@ class PatternCatalog(Catalog):
 
     def __init__(
         self,
+        name: str,
         urlpath: str,
         driver: str,
         autoreload: bool = True,
@@ -38,6 +39,8 @@ class PatternCatalog(Catalog):
         """
         Parameters
         ----------
+        name: str
+            Name of the catalog
         urlpath: str
             Location of the file to parse (can be remote)
         driver: str
@@ -55,6 +58,7 @@ class PatternCatalog(Catalog):
             Whether or not to construct a list of all the matching entries when the
             catalog is instantiated
         """
+        self.name = name
         self.urlpath = urlpath
         self.text = None
         self.autoreload = autoreload  # set this to False if don't want reloads
@@ -82,7 +86,7 @@ class PatternCatalog(Catalog):
         if "use_listings_cache" not in storage_options:
             storage_options["use_listings_cache"] = False
         super(PatternCatalog, self).__init__(
-            ttl=ttl, storage_options=storage_options, **kwargs
+            name=name, ttl=ttl, storage_options=storage_options, **kwargs
         )
 
     @property
@@ -116,16 +120,30 @@ class PatternCatalog(Catalog):
             urlpath = self.get_entry_path(**kwargs)
             if not self.get_fs().exists(urlpath):
                 raise KeyError
-
-            entry = registry[self.driver](
+            entry = _local_catalog_entry(
+                name=name,
                 urlpath=urlpath,
+                description=self.description,
+                filesystem=self.filesystem,
+                driver=self.driver,
                 metadata=self.metadata,
+                driver_kwargs=self.driver_kwargs,
                 storage_options=self.storage_options,
-                **self.driver_kwargs,
+            )
+            entry = local.LocalCatalogEntry(
+                name=name,
+                description=self.description,
+                driver=self.driver,
+                metadata=self.metadata,
+                args={
+                    "urlpath": urlpath,
+                    **self.driver_kwargs,
+                    "storage_options": self.storage_options,
+                },
             )
             self._entries[name] = entry
             self._kwarg_sets.append(kwargs)
-        return self._get_entries()[name]
+        return self._get_entries()[name].get()
 
     def get_fs(self):
         if self.filesystem is None:
@@ -170,15 +188,17 @@ class PatternCatalog(Catalog):
                 value_map = {k: v for k, v in zip(value_names, values)}
                 self._kwarg_sets.append(value_map)
                 urlpath = self.urlpath.format(**value_map)
-                entry = registry[self.driver](
+                name = PatternCatalog._entry_name(value_map)
+                entry = _local_catalog_entry(
+                    name=name,
                     urlpath=urlpath,
+                    description=self.description,
+                    filesystem=self.filesystem,
+                    driver=self.driver,
                     metadata=self.metadata,
+                    driver_kwargs=self.driver_kwargs,
                     storage_options=self.storage_options,
-                    **self.driver_kwargs,
                 )
-
-                entry._catalog = self
-                entry.name = PatternCatalog._entry_name(value_map)
                 if entry.name in self._entries:
                     warnings.warn(
                         "intake-patterncatalog failed to generate an entry for "
@@ -188,4 +208,28 @@ class PatternCatalog(Catalog):
                     )
                     continue
                 self._entries[entry.name] = entry
-                entry._filesystem = self.filesystem
+
+
+def _local_catalog_entry(
+    name: str,
+    urlpath: str,
+    description: str,
+    filesystem: str,
+    driver: str,
+    metadata: Mapping[object, object],
+    driver_kwargs: Mapping[str, Any],
+    storage_options: Mapping[object, object],
+):
+    entry = local.LocalCatalogEntry(
+        name=name,
+        description=description,
+        driver=driver,
+        metadata=metadata,
+        args={
+            "urlpath": urlpath,
+            **driver_kwargs,
+            "storage_options": storage_options,
+        },
+    )
+    entry._filesystem = filesystem
+    return entry
