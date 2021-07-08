@@ -27,6 +27,7 @@ class PatternCatalog(Catalog):
 
     def __init__(
         self,
+        name: str,
         urlpath: str,
         driver: str,
         autoreload: bool = True,
@@ -38,6 +39,8 @@ class PatternCatalog(Catalog):
         """
         Parameters
         ----------
+        name: str
+            Name of the catalog
         urlpath: str
             Location of the file to parse (can be remote)
         driver: str
@@ -55,6 +58,7 @@ class PatternCatalog(Catalog):
             Whether or not to construct a list of all the matching entries when the
             catalog is instantiated
         """
+        self.name = name
         self.urlpath = urlpath
         self.text = None
         self.autoreload = autoreload  # set this to False if don't want reloads
@@ -82,7 +86,7 @@ class PatternCatalog(Catalog):
         if "use_listings_cache" not in storage_options:
             storage_options["use_listings_cache"] = False
         super(PatternCatalog, self).__init__(
-            ttl=ttl, storage_options=storage_options, **kwargs
+            name=name, ttl=ttl, storage_options=storage_options, **kwargs
         )
 
     @property

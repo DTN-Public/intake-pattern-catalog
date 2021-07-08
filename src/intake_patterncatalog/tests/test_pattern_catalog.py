@@ -12,7 +12,7 @@ from intake_patterncatalog import PatternCatalog
     params=["file://{file}.csv", "simplecache::file://{file}.csv", "{file}.csv"]
 )
 def empty_catalog(request):
-    return PatternCatalog(request.param, driver="csv")
+    return PatternCatalog("empty", request.param, driver="csv")
 
 
 @pytest.fixture(scope="function")
@@ -30,6 +30,7 @@ def test_pattern_generation(empty_catalog):
 
 def test_no_ttl_s3(example_bucket, s3):
     cat = PatternCatalog(
+        name="cat",
         urlpath="s3://" + example_bucket + "/{num}.csv",
         driver="csv",
         ttl=-1,
@@ -42,6 +43,7 @@ def test_no_ttl_s3(example_bucket, s3):
 
 def test_ttl_s3(example_bucket, s3):
     cat = PatternCatalog(
+        name="cat",
         urlpath="s3://" + example_bucket + "/{num}.csv",
         driver="csv",
         ttl=0.1,
@@ -56,6 +58,7 @@ def test_ttl_s3(example_bucket, s3):
 
 def test_ttl_s3_parquet(example_bucket, s3):
     cat = PatternCatalog(
+        name="cat",
         urlpath="s3://" + example_bucket + "/{num}.parquet",
         driver="parquet",
         ttl=0.1,
@@ -78,6 +81,7 @@ def folder_with_csvs() -> Generator[str, None, None]:
 
 def test_unlistable_cat(folder_with_csvs: str):
     cat = PatternCatalog(
+        name="cat",
         urlpath=str(Path(folder_with_csvs, "{num}.csv")),
         driver="csv",
         listable=False,
@@ -112,6 +116,7 @@ def recursive_s3(s3) -> str:
 
 def test_recursive_s3(recursive_s3: str):
     cat = PatternCatalog(
+        name="cat",
         urlpath=recursive_s3,
         driver="csv",
         recursive_glob=True,
@@ -125,6 +130,7 @@ def test_recursive_s3(recursive_s3: str):
 
 def test_non_recursive_s3(recursive_s3: str):
     cat = PatternCatalog(
+        name="cat",
         urlpath=recursive_s3,
         driver="csv",
         recursive_glob=False,
@@ -139,6 +145,7 @@ def test_warn_on_duplicates(example_bucket, s3):
     s3.put_object(Body="", Bucket=example_bucket, Key="💣.csv")
     with pytest.warns(UserWarning, match="failed to generate an entry"):
         cat = PatternCatalog(
+            name="cat",
             urlpath="s3://" + example_bucket + "/{num}.csv",
             driver="csv",
             autoreload=True,
@@ -152,6 +159,7 @@ def test_walk(example_bucket, s3):
     s3.put_object(Body="", Bucket=example_bucket, Key="efgh.csv")
 
     cat = PatternCatalog(
+        name="cat",
         urlpath="s3://" + example_bucket + "/{num}.csv",
         driver="csv",
         autoreload=True,
@@ -159,3 +167,20 @@ def test_walk(example_bucket, s3):
     assert len(cat.walk()) == 2
     assert "num_abcd" in cat.walk()
     assert "num_efgh" in cat.walk()
+
+
+def test_search(example_bucket, s3):
+
+    s3.put_object(Body="", Bucket=example_bucket, Key="abcd.csv")
+    s3.put_object(Body="", Bucket=example_bucket, Key="efgh.csv")
+
+    cat = PatternCatalog(
+        name="cat",
+        urlpath="s3://" + example_bucket + "/{num}.csv",
+        driver="csv",
+        autoreload=True,
+    )
+    assert len(cat.search("abcd")) == 1
+    assert len(cat.search("efgh")) == 1
+    assert len(cat.search("abcd efgh")) == 2
+    assert len(cat.search("wxyz")) == 0
