@@ -144,3 +144,18 @@ def test_warn_on_duplicates(example_bucket, s3):
             autoreload=True,
         )
     assert len(cat) == 1
+
+
+def test_walk(example_bucket, s3):
+
+    s3.put_object(Body="", Bucket=example_bucket, Key="abcd.csv")
+    s3.put_object(Body="", Bucket=example_bucket, Key="efgh.csv")
+
+    cat = PatternCatalog(
+        urlpath="s3://" + example_bucket + "/{num}.csv",
+        driver="csv",
+        autoreload=True,
+    )
+    assert len(cat.walk()) == 2
+    assert "num_abcd" in cat.walk()
+    assert "num_efgh" in cat.walk()
