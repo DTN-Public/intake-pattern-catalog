@@ -12,7 +12,7 @@ from intake_patterncatalog import PatternCatalog
     params=["file://{file}.csv", "simplecache::file://{file}.csv", "{file}.csv"]
 )
 def empty_catalog(request):
-    return PatternCatalog("empty", request.param, driver="csv")
+    return PatternCatalog(urlpath=request.param, driver="csv")
 
 
 @pytest.fixture(scope="function")
@@ -175,7 +175,7 @@ def test_search(example_bucket, s3):
     s3.put_object(Body="", Bucket=example_bucket, Key="efgh.csv")
 
     cat = PatternCatalog(
-        name="cat",
+        name="search_requires_a_name",
         urlpath="s3://" + example_bucket + "/{num}.csv",
         driver="csv",
         autoreload=True,
