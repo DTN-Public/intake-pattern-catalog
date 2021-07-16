@@ -7,6 +7,10 @@ and this project adheres to [Calendar Versioning](https://calver.org/).
 
 ## [Unreleased]
 
+## [2021.7.8] - 2021-07-16
+
+- Fix second bug to allow `simplecache::` URLs to work
+
 ## [2021.7.7] - 2021-07-16
 
 - Add better diff links to changelog
@@ -23,7 +27,8 @@ and this project adheres to [Calendar Versioning](https://calver.org/).
 
 Change get_entry and load to support `.search()` of entries
 
-[Unreleased]: https://bitbucket.com/dtnse/intake-patterncatalog/branches/compare/2021.7.7..main
+[Unreleased]: https://bitbucket.com/dtnse/intake-patterncatalog/branches/compare/2021.7.8..main
+[2021.7.8]: https://bitbucket.com/dtnse/intake-patterncatalog/branches/compare/2021.7.8..2021.7.7#commits
 [2021.7.7]: https://bitbucket.com/dtnse/intake-patterncatalog/branches/compare/2021.7.7..2021.7.6#commits
 [2021.7.6]: https://bitbucket.com/dtnse/intake-patterncatalog/branches/compare/2021.7.6..2021.7.5#commits
 [2021.7.5]: https://bitbucket.com/dtnse/intake-patterncatalog/branches/compare/2021.7.5..2021.7.4#commits
