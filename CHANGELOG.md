@@ -19,5 +19,6 @@ and this project adheres to [Calendar Versioning](https://calver.org/).
 
 Change get_entry and load to support `.search()` of entries
 
-[Unreleased]: https://bitbucket.com/dtnse/intake-patterncatalog/compare/2021.7.5...HEAD
-[2021.7.5]: https://bitbucket.org/dtnse/intake-patterncatalog/releases/tag/2021.7.5
+[Unreleased]: https://bitbucket.com/dtnse/intake-patterncatalog/branches/compare/2021.7.5..main
+[2021.7.5]: https://bitbucket.org/dtnse/intake-patterncatalog/src/2021.7.5/
+[2021.7.6]: https://bitbucket.org/dtnse/intake-patterncatalog/src/2021.7.6/
