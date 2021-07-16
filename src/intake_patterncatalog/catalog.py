@@ -110,17 +110,6 @@ class PatternCatalog(Catalog):
                 driver_kwargs=self.driver_kwargs,
                 storage_options=self.storage_options,
             )
-            entry = local.LocalCatalogEntry(
-                name=name,
-                description=self.description,
-                driver=self.driver,
-                metadata=self.metadata,
-                args={
-                    "urlpath": urlpath,
-                    **self.driver_kwargs,
-                    "storage_options": self.storage_options,
-                },
-            )
             self._entries[name] = entry
             self._kwarg_sets.append(kwargs)
         return self._get_entries()[name].get()
