@@ -75,11 +75,7 @@ class PatternCatalog(Catalog):
 
     @property
     def _pattern(self):
-        if "::" not in self.urlpath:
-            urlpath = self.urlpath
-        else:
-            # removes simplecache:: or similar
-            urlpath = self.urlpath.split("::")[1]
+        urlpath = PatternCatalog._trim_prefix(self.urlpath)
         return strip_protocol(urlpath)  # removes s3://
 
     @staticmethod
@@ -102,7 +98,7 @@ class PatternCatalog(Catalog):
         name = PatternCatalog._entry_name(kwargs)
         if not self.listable and name not in self._get_entries():
             urlpath = self.get_entry_path(**kwargs)
-            if not self.get_fs().exists(urlpath):
+            if self._exists(urlpath) is False:
                 raise KeyError
             entry = _local_catalog_entry(
                 name=name,
@@ -153,7 +149,7 @@ class PatternCatalog(Catalog):
             try:
                 # Check for permission to inspect path before attempting to expand
                 # the glob. (Async globbing doesn't always raise exception.)
-                self.get_fs().exists(self._glob_path)
+                self._exists(self._glob_path)
             except PermissionError as e:
                 raise e
 
@@ -187,6 +183,14 @@ class PatternCatalog(Catalog):
                     )
                     continue
                 self._entries[entry.name] = entry
+
+    @staticmethod
+    def _trim_prefix(urlpath):
+        # Remove fsspec special prefixes from url (e.g. `simplecache::`)
+        return urlpath.split("::")[-1]
+
+    def _exists(self, urlpath: str) -> bool:
+        return self.get_fs().exists(PatternCatalog._trim_prefix(urlpath))
 
 
 def _local_catalog_entry(
