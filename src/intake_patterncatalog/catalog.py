@@ -45,7 +45,8 @@ class PatternCatalog(Catalog):
             Whether or not to construct a list of all the matching entries when the
             catalog is instantiated
         """
-        self.urlpath = urlpath
+        self.urlpath = PatternCatalog._trim_prefix(urlpath)
+        self.urlpath_with_fsspec_prefix = urlpath
         self.text = None
         self.autoreload = autoreload  # set this to False if don't want reloads
         self.filesystem = kwargs.pop("fs", None)
@@ -57,10 +58,10 @@ class PatternCatalog(Catalog):
 
         self._kwarg_sets: List[Dict[str, str]] = []
 
-        self._glob_path = path_to_glob(urlpath)
+        self._glob_path = path_to_glob(self.urlpath)
         if self.recursive_glob:
             self._glob_path = self._glob_path.replace("*", "**")
-        if urlpath == self._glob_path:
+        if self.urlpath == self._glob_path:
             raise ValueError("Path must contain one or more `{}` patterns.")
 
         storage_options = kwargs.pop("storage_options", {})
@@ -75,8 +76,7 @@ class PatternCatalog(Catalog):
 
     @property
     def _pattern(self):
-        urlpath = PatternCatalog._trim_prefix(self.urlpath)
-        return strip_protocol(urlpath)  # removes s3://
+        return strip_protocol(self.urlpath)  # removes s3://
 
     @staticmethod
     def _entry_name(value_map: Mapping[str, str]) -> str:
@@ -128,7 +128,7 @@ class PatternCatalog(Catalog):
         return self._kwarg_sets
 
     def get_entry_path(self, **kwargs) -> DataSource:
-        return self.urlpath.format(**kwargs)
+        return self.urlpath_with_fsspec_prefix.format(**kwargs)
 
     def _load(self, reload=False):
         # Don't try and get all the entries for very large patterns
@@ -151,7 +151,7 @@ class PatternCatalog(Catalog):
             for values in zip(*patterns.values()):
                 value_map = {k: v for k, v in zip(value_names, values)}
                 self._kwarg_sets.append(value_map)
-                urlpath = self.urlpath.format(**value_map)
+                urlpath = self.get_entry_path(**value_map)
                 name = PatternCatalog._entry_name(value_map)
                 entry = _local_catalog_entry(
                     name=name,
