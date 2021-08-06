@@ -32,5 +32,5 @@ ignore_missing_imports = true
 scripts_are_modules = true
 
 [tool.pytest.ini_options]
-testpaths = ["src/intake_patterncatalog/tests"]
+testpaths = ["src/intake_pattern_catalog/tests"]
 

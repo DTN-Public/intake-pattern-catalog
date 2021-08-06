@@ -20,11 +20,11 @@ def get_version_and_cmdclass(package_path):
     return module.__version__, module.cmdclass
 
 
-version, cmdclass = get_version_and_cmdclass("./src/intake_patterncatalog")
+version, cmdclass = get_version_and_cmdclass("./src/intake_pattern_catalog")
 
 
 setup(
-    name="dtn-intake-patterncatalog",
+    name="intake-pattern-catalog",
     description="",
     author="Tim Hopper",
     author_email="tim.hopper@dtn.com",

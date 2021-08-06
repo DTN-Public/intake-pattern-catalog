@@ -1,6 +1,6 @@
 # Intake Pattern Catalog
 
-intake-patterncatalog is a [plugin](https://intake.readthedocs.io/en/latest/plugin-directory.html) for Intake
+intake-pattern-catalog is a [plugin](https://intake.readthedocs.io/en/latest/plugin-directory.html) for Intake
 which allows you to specify a pattern which represents a number of different entries. Note that this is different from the patterns you can write with the csv driver which get turned into a single entry.
 
 Use `driver: pattern_cat` to use this driver in your catalogs.

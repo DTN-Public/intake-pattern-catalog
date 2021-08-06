@@ -11,13 +11,12 @@ Typically used by CI (Bitbucket Pipelines).
 
 import datetime as dt
 
+import intake_pattern_catalog
 from packaging.version import Version, parse
-
-import intake_patterncatalog
 
 NOW = dt.datetime.now()
 
-CURRENT_VERSION = parse(intake_patterncatalog.__version__)
+CURRENT_VERSION = parse(intake_pattern_catalog.__version__)
 
 
 def next_version(current_version: Version = CURRENT_VERSION, now=NOW):
@@ -33,7 +32,7 @@ def push_new_version():
     from git import Repo
 
     obj = Repo(".")
-    current_version = intake_patterncatalog.__version__
+    current_version = intake_pattern_catalog.__version__
     if current_version.startswith("unknown"):
         current_version = "0000.0.0"
     print(f"Current version: {current_version}")
