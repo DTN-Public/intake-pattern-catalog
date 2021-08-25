@@ -3,9 +3,11 @@ from tempfile import TemporaryDirectory
 from time import sleep
 from typing import Generator
 
+import pandas as pd
 import pytest
+from pandas.testing import assert_frame_equal
 
-from intake_patterncatalog import PatternCatalog
+from intake_patterncatalog import PatternCatalog, PatternCatalogTransform
 
 
 @pytest.fixture(
@@ -75,7 +77,7 @@ def test_ttl_s3_parquet(example_bucket, s3):
 def folder_with_csvs() -> Generator[str, None, None]:
     with TemporaryDirectory() as tempdir:
         for i in range(10):
-            Path(tempdir, f"{i}.csv").touch()
+            Path(tempdir, f"{i}.csv").write_text(f"a\n{i}")
         yield str(tempdir)
 
 
@@ -184,3 +186,94 @@ def test_search(example_bucket, s3):
     assert len(cat.search("efgh")) == 1
     assert len(cat.search("abcd efgh")) == 2
     assert len(cat.search("wxyz")) == 0
+
+
+def unity_transform(df: pd.DataFrame) -> pd.DataFrame:
+    return df
+
+
+def test_derived_dataset_unity(folder_with_csvs: str):
+    cat = PatternCatalog(
+        name="catalog_to_transform",
+        urlpath=str(Path(folder_with_csvs, "{num}.csv")),
+        driver="csv",
+    )
+
+    derived_cat = PatternCatalogTransform(
+        targets=[cat],
+        transform=unity_transform,
+        target_kwargs=None,
+        transform_kwargs=None,
+        metadata=None,
+    )
+
+    assert_frame_equal(derived_cat.get_entry(num=1).read(), cat.get_entry(num=1).read())
+
+
+def double_transform(df: pd.DataFrame) -> pd.DataFrame:
+    return df * 2
+
+
+def test_derived_dataset_with_transform(folder_with_csvs: str):
+    cat = PatternCatalog(
+        name="catalog_to_transform",
+        urlpath=str(Path(folder_with_csvs, "{num}.csv")),
+        driver="csv",
+    )
+
+    derived_cat = PatternCatalogTransform(
+        targets=[cat],
+        transform=double_transform,
+        target_kwargs=None,
+        transform_kwargs=None,
+        metadata=None,
+    )
+
+    assert_frame_equal(
+        derived_cat.get_entry(num=1).read(),
+        double_transform(cat.get_entry(num=1).read()),
+    )
+
+
+def test_derived_dataset_with_transform_to_dask(folder_with_csvs: str):
+    cat = PatternCatalog(
+        name="catalog_to_transform",
+        urlpath=str(Path(folder_with_csvs, "{num}.csv")),
+        driver="csv",
+    )
+
+    derived_cat = PatternCatalogTransform(
+        targets=[cat],
+        transform=double_transform,
+        target_kwargs=None,
+        transform_kwargs=None,
+        metadata=None,
+    )
+
+    assert_frame_equal(
+        derived_cat.get_entry(num=1).to_dask().compute(),
+        double_transform(cat.get_entry(num=1).to_dask().compute()),
+    )
+
+
+def test_derived_dataset_with_transform_other_properties(folder_with_csvs: str):
+    cat = PatternCatalog(
+        name="catalog_to_transform",
+        urlpath=str(Path(folder_with_csvs, "{num}.csv")),
+        driver="csv",
+        description="Description",
+    )
+
+    derived_cat = PatternCatalogTransform(
+        targets=[cat],
+        transform=double_transform,
+        target_kwargs=None,
+        transform_kwargs=None,
+        metadata=None,
+    )
+
+    derived_entry = derived_cat.get_entry(num=1)
+    entry = cat.get_entry(num=1)
+
+    for attr in ["urlpath", "name", "storage_options", "yaml", "description"]:
+        assert getattr(derived_entry, attr) == getattr(entry, attr)

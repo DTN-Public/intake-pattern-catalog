@@ -1,5 +1,5 @@
 from ._version import __version__  # noqa
-from .catalog import PatternCatalog  # noqa
+from .catalog import PatternCatalog, PatternCatalogTransform  # noqa
 
 try:
     # Hack thing from miniver to avoid confusion
