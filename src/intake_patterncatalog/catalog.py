@@ -214,8 +214,6 @@ class PatternCatalogTransformedObject:
     by applying a transform to the result
     """
 
-    name = "pattern_cat_transform"
-
     def __init__(
         self,
         base_object: DataSource,
@@ -248,6 +246,10 @@ class PatternCatalogTransformedObject:
 
 
 class PatternCatalogTransform(GenericTransform):
+    name = "pattern_cat_transform"
+    container = "catalog"
+    partition_access = None
+
     def __init__(
         self,
         targets,
