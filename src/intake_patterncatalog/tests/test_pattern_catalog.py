@@ -277,3 +277,29 @@ def test_derived_dataset_with_transform_other_properties(folder_with_csvs: str):
 
     for attr in ["urlpath", "name", "storage_options", "yaml", "description"]:
         assert getattr(derived_entry, attr) == getattr(entry, attr)
+
+
+def multiply_transform(df: pd.DataFrame, multiply_by: float) -> pd.DataFrame:
+    return df * multiply_by
+
+
+def test_derived_dataset_with_kwargs(folder_with_csvs: str):
+    cat = PatternCatalog(
+        name="catalog_to_transform",
+        urlpath=str(Path(folder_with_csvs, "{num}.csv")),
+        driver="csv",
+    )
+
+    transform_kwargs = {"multiply_by": 5}
+    derived_cat = PatternCatalogTransform(
+        targets=[cat],
+        transform=multiply_transform,
+        target_kwargs=None,
+        transform_kwargs=transform_kwargs,
+        metadata=None,
+    )
+
+    assert_frame_equal(
+        derived_cat.get_entry(num=1).read(),
+        multiply_transform(cat.get_entry(num=1).read(), **transform_kwargs),
+    )
