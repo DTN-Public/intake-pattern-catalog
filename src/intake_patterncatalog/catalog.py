@@ -209,6 +209,11 @@ def _local_catalog_entry(
 
 
 class PatternCatalogTransformedObject:
+    """
+    Thin wrapper around a Datasource that overrides the read and to_dask methods
+    by applying a transform to the result
+    """
+
     def __init__(
         self,
         base_object: DataSource,
@@ -218,6 +223,12 @@ class PatternCatalogTransformedObject:
         self.base_object = base_object
         self.transform = transform
         self.transform_kwargs = transform_kwargs or {}
+
+    def __repr__(self) -> str:
+        return f"Transform wrapper around:\n{repr(self.base_object)}"
+
+    def __str__(self) -> str:
+        return f"Transform wrapper around:\n{self.base_object}"
 
     def read(self):
         raw = self.base_object.read()
