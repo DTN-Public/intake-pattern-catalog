@@ -214,6 +214,8 @@ class PatternCatalogTransformedObject:
     by applying a transform to the result
     """
 
+    name = "pattern_cat_transform"
+
     def __init__(
         self,
         base_object: DataSource,
