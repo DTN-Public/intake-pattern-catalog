@@ -89,5 +89,6 @@ pipelines:
                 - git pull --all --tags
                 - git describe --long --tags
                 - pip install .
+                - pip install twine
                 - python setup.py sdist bdist_wheel --universal
                 - twine upload -r testpypi dist/* --username $TEST_PYPI_USERNAME --password $TEST_PYPI_API_KEY
