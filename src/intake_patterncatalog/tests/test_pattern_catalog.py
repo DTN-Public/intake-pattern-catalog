@@ -3,6 +3,7 @@ from tempfile import TemporaryDirectory
 from time import sleep
 from typing import Generator
 
+import intake
 import pandas as pd
 import pytest
 from pandas.testing import assert_frame_equal
@@ -275,7 +276,7 @@ def test_derived_dataset_with_transform_other_properties(folder_with_csvs: str):
     derived_entry = derived_cat.get_entry(num=1)
     entry = cat.get_entry(num=1)
 
-    for attr in ["urlpath", "name", "storage_options", "yaml", "description"]:
+    for attr in ["urlpath", "storage_options", "yaml", "description"]:
         assert getattr(derived_entry, attr) == getattr(entry, attr)
 
 
@@ -303,3 +304,18 @@ def test_derived_dataset_with_kwargs(folder_with_csvs: str):
         derived_cat.get_entry(num=1).read(),
         multiply_transform(cat.get_entry(num=1).read(), **transform_kwargs),
     )
+
+
+@pytest.fixture
+def yaml_catalog():
+    return intake.open_catalog("src/intake_patterncatalog/tests/test.yaml")
+
+
+def test_yaml(yaml_catalog):
+    entry = yaml_catalog.folder_with_csvs.get_entry(num=1)
+    assert entry.read()["a"][0] == 1
+
+
+def test_yaml_transformed(yaml_catalog):
+    entry = yaml_catalog.folder_with_csvs_transformed.get_entry(num=1)
+    assert entry.read()["a"][0] == 2

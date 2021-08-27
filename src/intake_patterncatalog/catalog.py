@@ -246,11 +246,17 @@ class PatternCatalogTransformedObject:
 
 
 class PatternCatalogTransform(GenericTransform):
+    name = "pattern_cat_transform"
+    container = "catalog"
+    partition_access = None
+    input_container = "catalog"
+
     def __init__(
         self,
         targets,
-        target_kwargs,
-        metadata,
+        target_kwargs=None,
+        metadata=None,
+        transform_kwargs=None,
         target_chooser=first,
         **kwargs,
     ):
@@ -258,16 +264,13 @@ class PatternCatalogTransform(GenericTransform):
             targets,
             target_chooser=target_chooser,
             target_kwargs=target_kwargs,
-            container="catalog",
-            input_container="catalog",
+            container=self.container,
+            input_container=self.input_container,
             metadata=metadata,
+            transform_kwargs=transform_kwargs,
             **kwargs,
         )
-        self._pick()
-        if not isinstance(self._source, PatternCatalog):
-            raise ValueError(
-                "PatternCatalogTransform only works with PatternCatalog targets"
-            )
+        self._source_picked = False
 
     def read(self):
         raise NotImplementedError("Must use get_entry(...).read()")
@@ -276,6 +279,14 @@ class PatternCatalogTransform(GenericTransform):
         raise NotImplementedError("Must use get_entry(...).to_dask()")
 
     def get_entry(self, **kwargs):
+        if not self._source_picked:
+            self._pick()
+            if not isinstance(self._source, PatternCatalog):
+                raise ValueError(
+                    "PatternCatalogTransform only works with PatternCatalog targets"
+                )
+            self._source_picked = True
+
         entry = self._source.get_entry(**kwargs)
 
         transformed = PatternCatalogTransformedObject(

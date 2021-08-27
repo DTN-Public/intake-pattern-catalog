@@ -1,0 +1,18 @@
+---
+metadata:
+  version: 1
+
+sources:
+  folder_with_csvs:
+    description: Folder with 3 csvs
+    driver: pattern_cat
+    args:
+      urlpath: src/intake_patterncatalog/tests/data/{num}.csv
+      driver: csv
+  folder_with_csvs_transformed:
+    description: ERA5 waves and atmospheric surface variables as a pandas dataframe
+    driver: pattern_cat_transform
+    args:
+      targets:
+        - folder_with_csvs
+      transform: "intake_patterncatalog.tests.test_pattern_catalog.double_transform"
