@@ -7,6 +7,10 @@ and this project adheres to [Calendar Versioning](https://calver.org/).
 
 ## [Unreleased]
 
+## [2021.8.0] - 2021-08-25
+
+- Added PatternCatalogTransform class, which allows for datasets to be created based on a transformation applied to PatternCatalog entries
+
 ## [2021.7.8] - 2021-07-16
 
 - Fix second bug to allow `simplecache::` URLs to work
@@ -27,7 +31,8 @@ and this project adheres to [Calendar Versioning](https://calver.org/).
 
 Change get_entry and load to support `.search()` of entries
 
-[Unreleased]: https://bitbucket.com/dtnse/intake-patterncatalog/branches/compare/2021.7.8..main
+[Unreleased]: https://bitbucket.com/dtnse/intake-patterncatalog/branches/compare/2021.8.0..main
+[2021.7.9]: https://bitbucket.com/dtnse/intake-patterncatalog/branches/compare/2021.8.0..2021.7.8#commits
 [2021.7.8]: https://bitbucket.com/dtnse/intake-patterncatalog/branches/compare/2021.7.8..2021.7.7#commits
 [2021.7.7]: https://bitbucket.com/dtnse/intake-patterncatalog/branches/compare/2021.7.7..2021.7.6#commits
 [2021.7.6]: https://bitbucket.com/dtnse/intake-patterncatalog/branches/compare/2021.7.6..2021.7.5#commits

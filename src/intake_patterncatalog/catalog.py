@@ -1,10 +1,11 @@
 import warnings
-from typing import Any, Dict, List, Mapping
+from typing import Any, Callable, Dict, List, Mapping
 
 from fsspec.core import strip_protocol, url_to_fs
 from intake.catalog import Catalog, local
 from intake.catalog.utils import reload_on_change
 from intake.source.base import DataSource
+from intake.source.derived import GenericTransform, first
 from intake.source.utils import path_to_glob, reverse_formats
 
 
@@ -205,3 +206,91 @@ def _local_catalog_entry(
     )
     entry._filesystem = filesystem
     return entry
+
+
+class PatternCatalogTransformedObject:
+    """
+    Thin wrapper around a Datasource that overrides the read and to_dask methods
+    by applying a transform to the result
+    """
+
+    def __init__(
+        self,
+        base_object: DataSource,
+        transform: Callable,
+        transform_kwargs: Mapping[str, Any] = None,
+    ) -> None:
+        self.base_object = base_object
+        self.transform = transform
+        self.transform_kwargs = transform_kwargs or {}
+
+    def __repr__(self) -> str:
+        return f"Transform wrapper around:\n{repr(self.base_object)}"
+
+    def __str__(self) -> str:
+        return f"Transform wrapper around:\n{self.base_object}"
+
+    def read(self):
+        raw = self.base_object.read()
+        return self.transform(raw, **self.transform_kwargs)
+
+    def to_dask(self):
+        raw = self.base_object.to_dask()
+        return self.transform(raw, **self.transform_kwargs)
+
+    # For anything besides read and to_dask, use the underlying
+    # object's properties
+    def __getattr__(self, name):
+        if name not in ["read", "to_dask"]:
+            return getattr(self.base_object, name)
+
+
+class PatternCatalogTransform(GenericTransform):
+    name = "pattern_cat_transform"
+    container = "catalog"
+    partition_access = None
+    input_container = "catalog"
+
+    def __init__(
+        self,
+        targets,
+        target_kwargs=None,
+        metadata=None,
+        transform_kwargs=None,
+        target_chooser=first,
+        **kwargs,
+    ):
+        super().__init__(
+            targets,
+            target_chooser=target_chooser,
+            target_kwargs=target_kwargs,
+            container=self.container,
+            input_container=self.input_container,
+            metadata=metadata,
+            transform_kwargs=transform_kwargs,
+            **kwargs,
+        )
+        self._source_picked = False
+
+    def read(self):
+        raise NotImplementedError("Must use get_entry(...).read()")
+
+    def to_dask(self):
+        raise NotImplementedError("Must use get_entry(...).to_dask()")
+
+    def get_entry(self, **kwargs):
+        if not self._source_picked:
+            self._pick()
+            if not isinstance(self._source, PatternCatalog):
+                raise ValueError(
+                    "PatternCatalogTransform only works with PatternCatalog targets"
+                )
+            self._source_picked = True
+
+        entry = self._source.get_entry(**kwargs)
+
+        transformed = PatternCatalogTransformedObject(
+            entry, self._transform, self._params["transform_kwargs"]
+        )
+
+        return transformed

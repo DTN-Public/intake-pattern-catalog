@@ -1,0 +1,31 @@
+package:
+  name: dtn-intake-patterncatalog
+  version: "{{ GIT_DESCRIBE_TAG }}"
+
+source:
+  git_url: ../
+
+build:
+  noarch: python
+  number: "{{ GIT_DESCRIBE_NUMBER }}"
+  script: "{{ PYTHON }} -m pip install . -vvv"
+
+requirements:
+  host:
+    - python
+    - pip
+  run:
+    - python
+    - fsspec>=2021.4.0
+    - intake
+    - s3fs
+    - boto3==1.17.49
+    - msgpack-python
+
+test:
+  imports:
+    - intake_patterncatalog
+
+about:
+  home: https://bitbucket.org/dtnse/intake-patterncatalog
+  summary: DTN-DS intake plugin for pattern-based catalog entries
