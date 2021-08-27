@@ -31,9 +31,9 @@ and this project adheres to [Calendar Versioning](https://calver.org/).
 
 Change get_entry and load to support `.search()` of entries
 
-[Unreleased]: https://bitbucket.com/dtnse/intake-patterncatalog/branches/compare/2021.8.0..main
-[2021.7.9]: https://bitbucket.com/dtnse/intake-patterncatalog/branches/compare/2021.8.0..2021.7.8#commits
-[2021.7.8]: https://bitbucket.com/dtnse/intake-patterncatalog/branches/compare/2021.7.8..2021.7.7#commits
-[2021.7.7]: https://bitbucket.com/dtnse/intake-patterncatalog/branches/compare/2021.7.7..2021.7.6#commits
-[2021.7.6]: https://bitbucket.com/dtnse/intake-patterncatalog/branches/compare/2021.7.6..2021.7.5#commits
-[2021.7.5]: https://bitbucket.com/dtnse/intake-patterncatalog/branches/compare/2021.7.5..2021.7.4#commits
+[Unreleased]: https://bitbucket.com/dtnse/intake_pattern_catalog/branches/compare/2021.8.0..main
+[2021.7.9]: https://bitbucket.com/dtnse/intake_pattern_catalog/branches/compare/2021.8.0..2021.7.8#commits
+[2021.7.8]: https://bitbucket.com/dtnse/intake_pattern_catalog/branches/compare/2021.7.8..2021.7.7#commits
+[2021.7.7]: https://bitbucket.com/dtnse/intake_pattern_catalog/branches/compare/2021.7.7..2021.7.6#commits
+[2021.7.6]: https://bitbucket.com/dtnse/intake_pattern_catalog/branches/compare/2021.7.6..2021.7.5#commits
+[2021.7.5]: https://bitbucket.com/dtnse/intake_pattern_catalog/branches/compare/2021.7.5..2021.7.4#commits

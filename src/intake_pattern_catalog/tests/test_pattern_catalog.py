@@ -8,7 +8,7 @@ import pandas as pd
 import pytest
 from pandas.testing import assert_frame_equal
 
-from intake_patterncatalog import PatternCatalog, PatternCatalogTransform
+from intake_pattern_catalog import PatternCatalog, PatternCatalogTransform
 
 
 @pytest.fixture(
@@ -308,7 +308,7 @@ def test_derived_dataset_with_kwargs(folder_with_csvs: str):
 
 @pytest.fixture
 def yaml_catalog():
-    return intake.open_catalog("src/intake_patterncatalog/tests/test.yaml")
+    return intake.open_catalog("src/intake_pattern_catalog/tests/test.yaml")
 
 
 def test_yaml(yaml_catalog):

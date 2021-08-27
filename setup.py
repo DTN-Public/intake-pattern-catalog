@@ -34,8 +34,8 @@ setup(
     zip_safe=False,
     entry_points={
         "intake.drivers": [
-            "pattern_cat = intake_patterncatalog:PatternCatalog",
-            "pattern_cat_transform = intake_patterncatalog:PatternCatalogTransform",
+            "pattern_cat = intake_pattern_catalog:PatternCatalog",
+            "pattern_cat_transform = intake_pattern_catalog:PatternCatalogTransform",
         ]
     },
     version=version,

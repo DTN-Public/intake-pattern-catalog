@@ -1,5 +1,5 @@
 package:
-  name: dtn-intake-patterncatalog
+  name: intake_pattern_catalog
   version: "{{ GIT_DESCRIBE_TAG }}"
 
 source:
@@ -24,8 +24,8 @@ requirements:
 
 test:
   imports:
-    - intake_patterncatalog
+    - intake_pattern_catalog
 
 about:
-  home: https://bitbucket.org/dtnse/intake-patterncatalog
-  summary: DTN-DS intake plugin for pattern-based catalog entries
+  home: https://bitbucket.org/dtnse/intake_pattern_catalog
+  summary: Intake plugin for specifying a file-path pattern which can represent a number of different entries
