@@ -14,3 +14,4 @@ moto[s3]
 cruft
 GitPython
 pdbpp
+twine
