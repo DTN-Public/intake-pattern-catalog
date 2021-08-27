@@ -23,12 +23,19 @@ def get_version_and_cmdclass(package_path):
 version, cmdclass = get_version_and_cmdclass("./src/intake_pattern_catalog")
 
 
+this_directory = Path(__file__).parent
+readme = (this_directory / "README.md").read_text()
+
+
 setup(
     name="intake-pattern-catalog",
-    description="",
+    description="Intake plugin for specifying a file-path pattern which can represent a number of different entries",
+    long_description=readme,
+    long_description_content_type="text/markdown",
     author="Tim Hopper",
     author_email="tim.hopper@dtn.com",
     install_requires=[str(r) for r in parse_requirements(requirements)],  # type: ignore
+    url="https://bitbucket.org/dtnse/intake_pattern_catalog/",
     packages=find_packages(where="src"),
     package_dir={"": "src"},
     zip_safe=False,
