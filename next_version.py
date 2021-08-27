@@ -11,8 +11,9 @@ Typically used by CI (Bitbucket Pipelines).
 
 import datetime as dt
 
-import intake_pattern_catalog
 from packaging.version import Version, parse
+
+import intake_pattern_catalog
 
 NOW = dt.datetime.now()
 

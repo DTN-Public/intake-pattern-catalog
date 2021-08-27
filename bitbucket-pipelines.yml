@@ -1,0 +1,93 @@
+image: python:3.9
+definitions:
+  snippets:
+  steps:
+    - step: &flake8
+        name: flake8 linter
+        caches:
+          - pip
+        script:
+          - pip install pre-commit -q
+          - pre-commit run --all-files flake8
+    - step: &mypy
+        name: mypy type checks
+        caches:
+          - pip
+        script:
+          - pip install pre-commit -q
+          - pre-commit run --all-files mypy
+    - step: &isort
+        name: isort formatting
+        caches:
+          - pip
+        script:
+          - pip install pre-commit -q
+          - pre-commit run --all-files isort
+    - step: &black
+        name: Black formatting
+        caches:
+          - pip
+        script:
+          - pip install pre-commit -q
+          - pre-commit run --all-files black
+    - step: &yamllint
+        name: YAML Lint
+        caches:
+          - pip
+        script:
+          - pip install pre-commit -q
+          - pre-commit run --all-files yamllint
+    - step: &test
+        name: Run Tests
+        caches:
+          - pip
+        script:
+          - pip install -q -r dev-requirements.txt
+          - pip install -q -e .
+          - pytest -v --junitxml=test-reports/report.xml
+    - step: &bump
+        name: Bump version for commits into main
+        caches:
+          - pip
+        script:
+          - pip install -r dev-requirements.txt
+          - git describe || git tag 0000.0.0 --message "bootstrap with dummy version"
+            && git push origin 0000.0.0
+          - pip install .
+          - git describe --long --tags
+          - python -c "import next_version; next_version.push_new_version()"
+          - git describe --long --tags
+pipelines:
+  default:
+    - parallel:
+        - step: *flake8
+        - step: *mypy
+        - step: *black
+        - step: *isort
+        - step: *yamllint
+        - step: *test
+  custom:
+    just-test:
+      - step: *test
+  branches:
+    main:
+      - parallel:
+          - step: *flake8
+          - step: *mypy
+          - step: *black
+          - step: *isort
+          - step: *yamllint
+          - step: *test
+      - step: *bump
+  tags:
+    "**":
+      - parallel:
+          - step:
+              name: Trigger release to PyPI
+              script:
+                - env | sort
+                - git pull --all --tags
+                - git describe --long --tags
+                - pip install .
+                - python setup.py sdist bdist_wheel --universal
+                - twine upload -r testpypi dist/* --username $TEST_PYPI_USERNAME --password $TEST_PYPI_API_KEY
