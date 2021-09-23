@@ -5,7 +5,7 @@ which allows you to specify a file-path pattern which can represent a number of 
 
 _Note that this is different from the patterns you can write with the csv driver which get turned into a single entry_
 
-<img src="dtn.png" alt="dtn logo" style="width:200px;"/>
+![](dtn.png)
 
 ## Installation instructions
 
