@@ -5,6 +5,18 @@ which allows you to specify a file-path pattern which can represent a number of 
 
 _Note that this is different from the patterns you can write with the csv driver which get turned into a single entry_
 
+![](dtn.png)
+
+## Installation instructions
+
+```bash
+pip install intake-pattern-catalog
+# or
+conda install intake-pattern-catalog
+```
+
+## Usage
+
 Use `driver: pattern_cat` to use this driver in your catalogs.
 
 Consider the following list of files in an S3 bucket:
@@ -27,6 +39,23 @@ sources:
     args:
       urlpath: "s3://bucket-name/folder/{foo}_{bar}.csv"
       driver: csv
+```
+
+### Derived datasets
+
+If you would like to create a
+[derived dataset](https://intake.readthedocs.io/en/latest/transforms.html) based on a
+`pattern_cat` dataset, you can use `driver: pattern_cat_transform`, which will apply
+a transformation function to each entry returned by `get_entry`. For example, you can
+add to the above example yaml file:
+```yaml
+  stuff_transformed:
+    description: Everything in stuff, doubled
+    driver: pattern_cat_transform
+    args:
+      targets:
+        - stuff
+      transform: "path.to.doubling_function"
 ```
 
 ## Catalog API
