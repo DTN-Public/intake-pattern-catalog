@@ -10,7 +10,7 @@ sources:
       urlpath: src/intake_pattern_catalog/tests/data/{num}.csv
       driver: csv
   folder_with_csvs_transformed:
-    description: ERA5 waves and atmospheric surface variables as a pandas dataframe
+    description: description
     driver: pattern_cat_transform
     args:
       targets:
