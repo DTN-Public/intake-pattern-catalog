@@ -32,6 +32,7 @@ def test_pattern_generation(empty_catalog):
 
 
 def test_no_ttl_s3(example_bucket, s3):
+
     cat = PatternCatalog(
         name="cat",
         urlpath="s3://" + example_bucket + "/{num}.csv",
