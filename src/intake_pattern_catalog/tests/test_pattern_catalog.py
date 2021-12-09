@@ -329,7 +329,11 @@ def test_globbed_files(tmp_path):
     pd.DataFrame(data={"col1": [3, 4], "col2": [5, 6]}).to_csv(
         tmp_path / "a" / "df2.csv"
     )
-    globbed_df =  intake.open_pattern_cat(
-        urlpath=f"{tmp_path}/{{folder}}/*.csv", listable=False, driver="csv"
-    ).get_entry(folder="a").read()
+    globbed_df = (
+        intake.open_pattern_cat(
+            urlpath=f"{tmp_path}/{{folder}}/*.csv", listable=False, driver="csv"
+        )
+        .get_entry(folder="a")
+        .read()
+    )
     assert len(globbed_df) == 4
