@@ -7,6 +7,11 @@ and this project adheres to [Calendar Versioning](https://calver.org/).
 
 ## [Unreleased]
 
+## [2021.12.0] - 2021-12-10
+
+- Fixed bug preventing globbing and patterns from being used together. Now globs are
+passed through to driver.
+
 ## [2021.8.0] - 2021-08-25
 
 - Added PatternCatalogTransform class, which allows for datasets to be created based on a transformation applied to PatternCatalog entries
