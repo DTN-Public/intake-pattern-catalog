@@ -9,7 +9,7 @@ and this project adheres to [Calendar Versioning](https://calver.org/).
 
 ## [2021.12.1] - 2021-12-10
 
-- Unpin `boto3`.
+- Unpin `boto3` in requirements.
 
 ## [2021.12.0] - 2021-12-10
 
