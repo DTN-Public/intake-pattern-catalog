@@ -32,6 +32,7 @@ def test_pattern_generation(empty_catalog):
 
 
 def test_no_ttl_s3(example_bucket, s3):
+
     cat = PatternCatalog(
         name="cat",
         urlpath="s3://" + example_bucket + "/{num}.csv",
@@ -319,3 +320,21 @@ def test_yaml(yaml_catalog):
 def test_yaml_transformed(yaml_catalog):
     entry = yaml_catalog.folder_with_csvs_transformed.get_entry(num=1)
     assert entry.read()["a"][0] == 2
+
+
+def test_globbed_files(tmp_path):
+    (tmp_path / "a").mkdir()
+    pd.DataFrame(data={"col1": [1, 2], "col2": [3, 4]}).to_csv(
+        tmp_path / "a" / "df1.csv"
+    )
+    pd.DataFrame(data={"col1": [3, 4], "col2": [5, 6]}).to_csv(
+        tmp_path / "a" / "df2.csv"
+    )
+    globbed_df = (
+        intake.open_pattern_cat(
+            urlpath=f"{tmp_path}/{{folder}}/*.csv", listable=False, driver="csv"
+        )
+        .get_entry(folder="a")
+        .read()
+    )
+    assert len(globbed_df) == 4

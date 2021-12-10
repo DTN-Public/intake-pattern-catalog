@@ -180,7 +180,18 @@ class PatternCatalog(Catalog):
         return urlpath.split("::")[-1]
 
     def _exists(self, urlpath: str) -> bool:
-        return self.get_fs().exists(PatternCatalog._trim_prefix(urlpath))
+        p = PatternCatalog._trim_prefix(urlpath)
+        if "*" in p:
+            # Some drivers can glob and concatenate multiple files. In this case, we
+            # aren't able to check for the existance of a single file. Instead, expand
+            # the glob and make sure at least one files exists.
+            try:
+                self.get_fs().expand_path(p)
+                return True
+            except FileNotFoundError:
+                return False
+        else:
+            return self.get_fs().exists(p)
 
 
 def _local_catalog_entry(
