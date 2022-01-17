@@ -261,6 +261,7 @@ class PatternCatalogTransform(GenericTransform):
     container = "catalog"
     partition_access = None
     input_container = "catalog"
+    user_parameters: Dict = {}
 
     def __init__(
         self,

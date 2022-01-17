@@ -7,6 +7,10 @@ and this project adheres to [Calendar Versioning](https://calver.org/).
 
 ## [Unreleased]
 
+## [2022.1.0] - 2021-01-17
+
+- Make `user_parameters` and emtpy dict to comply with intake 0.6.5.
+
 ## [2021.12.1] - 2021-12-10
 
 - Unpin `boto3` in requirements.
