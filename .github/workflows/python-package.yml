@@ -34,4 +34,4 @@ jobs:
         pre-commit run --all-files
     - name: Test with pytest
       run: |
-        pytest -v --junitxml=test-reports/report.xml
+        pytest -v -r s -n auto --color=yes --junitxml=test-reports/report.xml
