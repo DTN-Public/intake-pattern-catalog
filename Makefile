@@ -1,5 +1,3 @@
-AZURE_DEFAULT_ROLE_ARN ?= arn:aws:iam::582752918649:role/login/project-dsci-user
-
 lint: lint-flake8 lint-mypy lint-isort lint-black
 
 format: format-black format-isort
