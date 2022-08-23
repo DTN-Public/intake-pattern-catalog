@@ -1,3 +1,17 @@
+[build-system]
+requires = ["setuptools", "setuptools-scm"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "intake-pattern-catalog"
+description = "Intake plugin for specifying a file-path pattern which can represent a number of different entries"
+authors = [{name = "Tim Hopper", email = "tim.hopper@dtn.com"}]
+dynamic = ["version"]
+
+[project.scripts]
+pattern_cat = "intake_pattern_catalog:PatternCatalog"
+pattern_cat_transform = "intake_pattern_catalog:PatternCatalogTransform"
+
 [tool.isort]
 profile = "black"
 line_length = 88
