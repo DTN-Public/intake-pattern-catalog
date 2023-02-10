@@ -1,5 +1,5 @@
 import warnings
-from typing import Any, Callable, Dict, List, Mapping
+from typing import Optional, Any, Callable, Dict, List, Mapping
 
 from fsspec.core import strip_protocol, url_to_fs
 from intake.catalog import Catalog, local
@@ -100,7 +100,7 @@ class PatternCatalog(Catalog):
         if not self.listable and name not in self._get_entries():
             urlpath = self.get_entry_path(**kwargs)
             if self._exists(urlpath) is False:
-                raise KeyError
+                raise KeyError(f"{urlpath} not found")
             entry = _local_catalog_entry(
                 name=name,
                 urlpath=urlpath,
@@ -229,7 +229,7 @@ class PatternCatalogTransformedObject:
         self,
         base_object: DataSource,
         transform: Callable,
-        transform_kwargs: Mapping[str, Any] = None,
+        transform_kwargs: Optional[Mapping[str, Any]] = None,
     ) -> None:
         self.base_object = base_object
         self.transform = transform

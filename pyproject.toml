@@ -1,10 +1,29 @@
-[tool.isort]
-profile = "black"
-line_length = 88
-skip = ["./.venv", "./direnv", ".env"]
+[build-system]
+requires = ["setuptools", "setuptools-scm"]
+build-backend = "setuptools.build_meta"
 
-[tool.cruft]
-skip = ["tests", ".git", ".mypy_cache", ".venv", ".direnv", ".env"]
+[project]
+name = "intake-pattern-catalog"
+description = "Intake plugin for specifying a file-path pattern which can represent a number of different entries"
+authors = [{name = "Tim Hopper", email = "tim.hopper@dtn.com"}]
+dependencies = [
+    "fsspec",
+    "intake",
+    "s3fs",
+    "msgpack",
+]
+dynamic = ["version", "readme"]
+
+[tool.setuptools.dynamic]
+version = {attr = "intake_pattern_catalog.__version__"}
+readme = {file = ["README.md"], content-type = "text/markdown"}
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[project.entry-points."intake.drivers"]
+pattern_cat = "intake_pattern_catalog:PatternCatalog"
+pattern_cat_transform = "intake_pattern_catalog:PatternCatalogTransform"
 
 [tool.black]
 exclude = '''
@@ -30,7 +49,3 @@ files = [
 follow_imports = "silent"
 ignore_missing_imports = true
 scripts_are_modules = true
-
-[tool.pytest.ini_options]
-testpaths = ["src/intake_pattern_catalog/tests"]
-

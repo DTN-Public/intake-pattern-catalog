@@ -7,7 +7,7 @@ sources:
     description: Folder with 3 csvs
     driver: pattern_cat
     args:
-      urlpath: src/intake_pattern_catalog/tests/data/{num}.csv
+      urlpath: tests/data/{num}.csv
       driver: csv
   folder_with_csvs_transformed:
     description: description
@@ -15,4 +15,4 @@ sources:
     args:
       targets:
         - folder_with_csvs
-      transform: "intake_pattern_catalog.tests.test_pattern_catalog.double_transform"
+      transform: "test_pattern_catalog.double_transform"

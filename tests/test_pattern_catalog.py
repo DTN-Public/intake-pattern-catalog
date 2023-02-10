@@ -97,11 +97,13 @@ def test_unlistable_cat(folder_with_csvs: str):
     # After valid entry is accessed, make sure entries has been populated
     assert len(list(cat)) == 1
     assert cat.get_entry(num=1)
-    # After valid entry is accessed again, make sure entry hasn't been duplicated in list
+    # After valid entry is accessed again,
+    # make sure entry hasn't been duplicated in list
     assert len(list(cat)) == 1
     # Check other valid entry
     assert cat.get_entry(num=5)
-    # After 2 valid entries are accessed, make sure entries has been populated with 2 entries
+    # After 2 valid entries are accessed,
+    # make sure entries has been populated with 2 entries
     assert len(list(cat)) == 2
     # Make sure accessing invalid entry raises a KeyError
     with pytest.raises(KeyError):
@@ -309,7 +311,7 @@ def test_derived_dataset_with_kwargs(folder_with_csvs: str):
 
 @pytest.fixture
 def yaml_catalog():
-    return intake.open_catalog("src/intake_pattern_catalog/tests/test.yaml")
+    return intake.open_catalog("tests/test.yaml")
 
 
 def test_yaml(yaml_catalog):
