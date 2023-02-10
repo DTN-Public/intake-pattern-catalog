@@ -1,5 +1,5 @@
 import warnings
-from typing import Optional, Any, Callable, Dict, List, Mapping
+from typing import Any, Callable, Dict, List, Mapping, Optional
 
 from fsspec.core import strip_protocol, url_to_fs
 from intake.catalog import Catalog, local

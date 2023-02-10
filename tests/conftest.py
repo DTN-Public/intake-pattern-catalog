@@ -3,8 +3,7 @@ Pytest Fixture Supporting S3FS Mocks from
 https://github.com/aio-libs/aiobotocore/issues/755#issuecomment-1424945194
 """
 import os
-
-from typing import Callable, Any
+from typing import Any, Callable
 from unittest.mock import MagicMock
 
 import aiobotocore.awsrequest

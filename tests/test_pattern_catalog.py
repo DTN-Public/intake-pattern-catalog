@@ -6,9 +6,8 @@ from typing import Generator
 import intake
 import pandas as pd
 import pytest
-from pandas.testing import assert_frame_equal
-
 from intake_pattern_catalog import PatternCatalog, PatternCatalogTransform
+from pandas.testing import assert_frame_equal
 
 
 @pytest.fixture(
