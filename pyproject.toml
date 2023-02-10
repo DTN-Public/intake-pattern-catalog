@@ -49,3 +49,13 @@ files = [
 follow_imports = "silent"
 ignore_missing_imports = true
 scripts_are_modules = true
+
+[tool.ruff]
+select = [
+    # Pyflakes
+    "E",
+    # pycodestyle
+    "F",
+    # isort
+    "I001",
+]
