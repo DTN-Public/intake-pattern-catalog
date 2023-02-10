@@ -10,7 +10,6 @@ dependencies = [
     "fsspec",
     "intake",
     "s3fs",
-    "msgpack",
 ]
 dynamic = ["version", "readme"]
 
