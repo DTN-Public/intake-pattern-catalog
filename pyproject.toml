@@ -17,9 +17,6 @@ dynamic = ["version", "readme"]
 version = {attr = "intake_pattern_catalog.__version__"}
 readme = {file = ["README.md"], content-type = "text/markdown"}
 
-[tool.setuptools.packages.find]
-where = ["src"]
-
 [project.entry-points."intake.drivers"]
 pattern_cat = "intake_pattern_catalog:PatternCatalog"
 pattern_cat_transform = "intake_pattern_catalog:PatternCatalogTransform"
