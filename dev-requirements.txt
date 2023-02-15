@@ -1,9 +1,9 @@
-pre-commit
 black
-mypy
-ruff
-yamllint
-pytest
 intake-parquet
 moto
+mypy
+pre-commit
+pytest
+ruff
 s3fs
+yamllint
