@@ -6,3 +6,4 @@ yamllint
 pytest
 intake-parquet
 moto
+s3fs
