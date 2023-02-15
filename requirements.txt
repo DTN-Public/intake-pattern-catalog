@@ -1,4 +1,3 @@
 fsspec
 intake
-requests
-s3fs
+requests # Remove after https://github.com/intake/intake/issues/708 closed
