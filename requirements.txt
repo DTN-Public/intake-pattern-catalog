@@ -1,4 +1,3 @@
-fsspec>=2021.4.0
+fsspec
 intake
-s3fs
-msgpack
+requests # Remove after https://github.com/intake/intake/issues/708 is closed

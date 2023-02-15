@@ -1,5 +1,2 @@
 ---
 extends: relaxed
-
-ignore: |
-  conda-recipe/
