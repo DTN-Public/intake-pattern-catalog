@@ -8,6 +8,9 @@ description = "Intake plugin for specifying a file-path pattern which can repres
 authors = [{name = "Tim Hopper", email = "tim.hopper@dtn.com"}]
 dynamic = ["dependencies", "readme", "version"]
 
+[project.urls]
+repository = "https://github.com/DTN-Public/intake-pattern-catalog"
+
 [tool.setuptools.dynamic]
 dependencies = {file = ["requirements.txt"]}
 readme = {file = ["README.md"], content-type = "text/markdown"}
