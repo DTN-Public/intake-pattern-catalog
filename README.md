@@ -1,5 +1,7 @@
 # Intake Pattern Catalog
 
+[![Available on pypi](https://img.shields.io/pypi/v/intake-pattern-catalog.svg)](https://pypi.python.org/pypi/intake-pattern-catalog/)
+
 intake-pattern-catalog is a [plugin](https://intake.readthedocs.io/en/latest/plugin-directory.html) for Intake
 which allows you to specify a file-path pattern which can represent a number of different entries.
 
