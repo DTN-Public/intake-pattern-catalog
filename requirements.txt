@@ -1,3 +1,2 @@
-fsspec
 intake
 requests # Remove after https://github.com/intake/intake/issues/708 is closed
