@@ -110,7 +110,6 @@ class PatternCatalog(Catalog):
             so = self.storage_options
             if self.reference: 
                 so['fo'] = urlpath
-                so = storage_options
 
             entry = _local_catalog_entry(
                 name=name,
@@ -169,7 +168,6 @@ class PatternCatalog(Catalog):
                 so = self.storage_options
                 if self.reference: 
                     so['fo'] = urlpath
-                    so = storage_options
 
                 entry = _local_catalog_entry(
                     name=name,
