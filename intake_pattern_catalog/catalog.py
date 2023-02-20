@@ -46,7 +46,7 @@ class PatternCatalog(Catalog):
             Whether or not to construct a list of all the matching entries when the
             catalog is instantiated
         """
-        if urlpath == "reference://"
+        if urlpath == "reference://":
             urlpath = kwargs['storage_options']['fo']
             self.reference = True
         else:
