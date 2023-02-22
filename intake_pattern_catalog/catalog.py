@@ -46,6 +46,11 @@ class PatternCatalog(Catalog):
             Whether or not to construct a list of all the matching entries when the
             catalog is instantiated
         """
+        if urlpath == "reference://":
+            urlpath = kwargs["storage_options"]["fo"]
+            self.reference = True
+        else:
+            self.reference = False
         self.urlpath = PatternCatalog._trim_prefix(urlpath)
         self.urlpath_with_fsspec_prefix = urlpath
         self.text = None
@@ -101,15 +106,20 @@ class PatternCatalog(Catalog):
             urlpath = self.get_entry_path(**kwargs)
             if self._exists(urlpath) is False:
                 raise KeyError(f"{urlpath} not found")
+
+            so = self.storage_options
+            if self.reference:
+                so["fo"] = urlpath
+
             entry = _local_catalog_entry(
                 name=name,
-                urlpath=urlpath,
+                urlpath=urlpath if not self.reference else "reference://",
                 description=self.description,
                 filesystem=self.filesystem,
                 driver=self.driver,
                 metadata=self.metadata,
                 driver_kwargs=self.driver_kwargs,
-                storage_options=self.storage_options,
+                storage_options=so,
             )
             self._entries[name] = entry
             self._kwarg_sets.append(kwargs)
@@ -154,15 +164,20 @@ class PatternCatalog(Catalog):
                 self._kwarg_sets.append(value_map)
                 urlpath = self.get_entry_path(**value_map)
                 name = PatternCatalog._entry_name(value_map)
+
+                so = self.storage_options
+                if self.reference:
+                    so["fo"] = urlpath
+
                 entry = _local_catalog_entry(
                     name=name,
-                    urlpath=urlpath,
+                    urlpath=urlpath if not self.reference else "reference://",
                     description=self.description,
                     filesystem=self.filesystem,
                     driver=self.driver,
                     metadata=self.metadata,
                     driver_kwargs=self.driver_kwargs,
-                    storage_options=self.storage_options,
+                    storage_options=so,
                 )
                 if entry.name in self._entries:
                     warnings.warn(

@@ -340,3 +340,20 @@ def test_globbed_files(tmp_path):
         .read()
     )
     assert len(globbed_df) == 4
+
+
+def test_kerchunk_reference_files(folder_with_csvs: str):
+    """
+    This tests whether pattern catalog will list from
+    storage_options['fo'] when url = reference://
+    """
+    cat = PatternCatalog(
+        name="catalog_to_transform",
+        urlpath="reference://",
+        driver="csv",
+        listable=True,
+        storage_options={"fo": str(Path(folder_with_csvs, "{num}.csv"))},
+    )
+
+    # Make sure I can access a valid entry without error
+    assert cat.get_entry(num=1)
