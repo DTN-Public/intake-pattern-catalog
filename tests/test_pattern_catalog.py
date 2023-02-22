@@ -343,7 +343,10 @@ def test_globbed_files(tmp_path):
 
 
 def test_kerchunk_reference_files(folder_with_csvs: str):
-    """this tests whether pattern catalog will list from storage_options['fo'] when url = reference://"""
+    """
+    This tests whether pattern catalog will list from 
+    storage_options['fo'] when url = reference://
+    """
     cat = PatternCatalog(
         name="catalog_to_transform",
         urlpath="reference://",
