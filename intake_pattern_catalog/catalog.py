@@ -47,7 +47,7 @@ class PatternCatalog(Catalog):
             catalog is instantiated
         """
         if urlpath == "reference://":
-            urlpath = kwargs['storage_options']['fo']
+            urlpath = kwargs["storage_options"]["fo"]
             self.reference = True
         else:
             self.reference = False
@@ -108,8 +108,8 @@ class PatternCatalog(Catalog):
                 raise KeyError(f"{urlpath} not found")
 
             so = self.storage_options
-            if self.reference: 
-                so['fo'] = urlpath
+            if self.reference:
+                so["fo"] = urlpath
 
             entry = _local_catalog_entry(
                 name=name,
@@ -166,8 +166,8 @@ class PatternCatalog(Catalog):
                 name = PatternCatalog._entry_name(value_map)
 
                 so = self.storage_options
-                if self.reference: 
-                    so['fo'] = urlpath
+                if self.reference:
+                    so["fo"] = urlpath
 
                 entry = _local_catalog_entry(
                     name=name,
