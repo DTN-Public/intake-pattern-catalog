@@ -39,7 +39,7 @@ line-length = 88
 
 [tool.mypy]
 files = [
-  "src/**/*.py",
+  "intake_pattern_catalog/*.py",
 ]
 follow_imports = "silent"
 ignore_missing_imports = true
