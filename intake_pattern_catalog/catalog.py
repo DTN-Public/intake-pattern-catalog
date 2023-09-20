@@ -1,5 +1,6 @@
 import warnings
 from typing import Any, Callable, Dict, List, Mapping, Optional
+from copy import copy
 
 from fsspec.core import strip_protocol, url_to_fs
 from intake.catalog import Catalog, local
@@ -169,13 +170,16 @@ class PatternCatalog(Catalog):
                 if self.reference:
                     so["fo"] = urlpath
 
+                metadata = copy(self.metadata)
+                metadata.update(value_map)
+
                 entry = _local_catalog_entry(
                     name=name,
                     urlpath=urlpath if not self.reference else "reference://",
                     description=self.description,
                     filesystem=self.filesystem,
                     driver=self.driver,
-                    metadata=self.metadata,
+                    metadata=metadata,
                     driver_kwargs=self.driver_kwargs,
                     storage_options=so,
                 )
